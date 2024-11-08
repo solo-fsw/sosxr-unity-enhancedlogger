@@ -15,12 +15,12 @@ namespace SOSXR.EnhancedLogger
     [ExecuteAlways]
     public class LogButtons : MonoBehaviour
     {
+        private static readonly int _buttonCount = (int) Enum.GetValues(typeof(LogLevel)).Cast<LogLevel>().Last() + 1; // We want to get the Max count of the enum LogLevel.
         private const string _menuPath = "SOSXR/EnhancedLogger/";
         private const float _buttonWidth = 80f;
         private const float _buttonHeight = 20f;
         private const float _margin_hor = 25;
         private const float _margin_vert = 50;
-        private static readonly int _buttonCount = (int) Enum.GetValues(typeof(LogLevel)).Cast<LogLevel>().Last() + 1; // We want to get the Max count of the enum LogLevel.
 
 
         [InitializeOnLoadMethod]
@@ -63,7 +63,7 @@ namespace SOSXR.EnhancedLogger
             {
                 Warning();
             }
-            
+
             if (CreateButton(nameof(Solid)))
             {
                 Solid();
@@ -144,6 +144,7 @@ namespace SOSXR.EnhancedLogger
             LogLevelEditorPrefs.SaveLogLevel();
         }
 
+
         /// <summary>
         ///     Choose if you want both Warning and Error logs shown.
         /// </summary>
@@ -154,7 +155,6 @@ namespace SOSXR.EnhancedLogger
             LogLevelEditorPrefs.SaveLogLevel();
         }
 
-        
 
         /// <summary>
         ///     Choose if you want Debug, Warning, and Error logs shown.

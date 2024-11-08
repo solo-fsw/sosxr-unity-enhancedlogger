@@ -28,7 +28,7 @@ namespace SOSXR.EnhancedLogger
         private const string SuccessColor = "green";
         private const string InfoColor = "pink";
 
-        
+
         public static LogLevel CurrentLogLevel = LogLevel.Debug;
 
 
