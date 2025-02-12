@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [2.2.1] --- in progress
+### Changed
+- Info from Pink to White since pink wasn't working
+
+
 ## [2.1.0] - 2025-01-31
 ### Added
 - Added samples as a separate thing: download them through the 'Samples' button in the package manager
