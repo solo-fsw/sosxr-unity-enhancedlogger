@@ -27,7 +27,7 @@ namespace SOSXR.EnhancedLogger
             Log.Error("Our current loglevel is", Log.CurrentLogLevel, "and we're changing that to", m_developmentBuildLogLevel);
             Log.CurrentLogLevel = m_developmentBuildLogLevel;
             #else
-            Log.Info("Our current loglevel is", Log.CurrentLogLevel, "and we're not changing that to", m_developmentBuildLogLevel);
+            Log.Verbose("Our current log level is", Log.CurrentLogLevel, "and we're not changing that to", m_developmentBuildLogLevel);
             #endif
         }
     }

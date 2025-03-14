@@ -27,6 +27,6 @@ public class DemoEnhancedLoggerTwo : MonoBehaviour
 
         Log.Success(nameof(gameObject), "This is a success message. It is shown when the log level is set to Success, or Info. But not when it's set to None, Error, or Warning.");
 
-        Log.Info(nameof(DemoEnhancedLoggerTwo), "This is an info message.", "It is only shown when the log level is set to Info");
+        Log.Verbose(nameof(DemoEnhancedLoggerTwo), "This is an info message.", "It is only shown when the log level is set to Info");
     }
 }

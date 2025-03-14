@@ -16,17 +16,17 @@ namespace SOSXR.EnhancedLogger
     {
         private const string ErrorPrefix = "<b>[!ERROR!]</b>";
         private const string WarningPrefix = "<b>[WARNING]</b>";
-        private const string SolidPrefix = "";
+        private const string InfoPrefix = "";
         private const string DebugPrefix = "<DEBUG>";
         private const string SuccessPrefix = "";
-        private const string InfoPrefix = "";
+        private const string VerbosePrefix = "";
 
         private const string ErrorColor = "red";
         private const string WarningColor = "yellow";
-        private const string SolidColor = "lightblue";
+        private const string InfoColor = "lightblue";
         private const string DebugColor = "orange";
         private const string SuccessColor = "green";
-        private const string InfoColor = "white";
+        private const string VerboseColor = "white";
 
 
         public static LogLevel CurrentLogLevel = LogLevel.Debug;
@@ -50,9 +50,10 @@ namespace SOSXR.EnhancedLogger
                    {
                        LogLevel.Error => ErrorPrefix,
                        LogLevel.Warning => WarningPrefix,
+                       LogLevel.Info => InfoPrefix,
                        LogLevel.Debug => DebugPrefix,
                        LogLevel.Success => SuccessPrefix,
-                       _ => InfoPrefix
+                       _ => VerbosePrefix
                    };
         }
 
@@ -63,9 +64,10 @@ namespace SOSXR.EnhancedLogger
                    {
                        LogLevel.Error => ErrorColor,
                        LogLevel.Warning => WarningColor,
+                       LogLevel.Info => InfoColor,
                        LogLevel.Debug => DebugColor,
                        LogLevel.Success => SuccessColor,
-                       _ => InfoColor
+                       _ => VerboseColor
                    };
         }
 
@@ -166,6 +168,30 @@ namespace SOSXR.EnhancedLogger
 
 
         /// <summary>
+        ///     Designed for general information messages.
+        ///     The logger defaults to show Info messages in the editor / development build (because it defaults to Debug and up).
+        /// </summary>
+        /// <param name="caller"></param>
+        /// <param name="message"></param>
+        public static void Info(this Object caller, params object[] message)
+        {
+            DoLog(LogLevel.Info, caller, message);
+        }
+
+
+        /// <summary>
+        ///     Designed for general information messages.
+        ///     The logger defaults to show Info messages in the editor / development build (because it defaults to Debug and up).
+        /// </summary>
+        /// <param name="caller"></param>
+        /// <param name="message"></param>
+        public static void Info(string caller, params object[] message)
+        {
+            DoLog(LogLevel.Info, caller, message);
+        }
+
+
+        /// <summary>
         ///     Designed for temporary debug messages.
         ///     The Logger defaults to show Debug messages in the editor / development build.
         /// </summary>
@@ -219,9 +245,9 @@ namespace SOSXR.EnhancedLogger
         /// </summary>
         /// <param name="caller"></param>
         /// <param name="message"></param>
-        public static void Info(this Object caller, params object[] message)
+        public static void Verbose(this Object caller, params object[] message)
         {
-            DoLog(LogLevel.Info, caller, message);
+            DoLog(LogLevel.Verbose, caller, message);
         }
 
 
@@ -231,9 +257,9 @@ namespace SOSXR.EnhancedLogger
         /// </summary>
         /// <param name="caller"></param>
         /// <param name="message"></param>
-        public static void Info(string caller, params object[] message)
+        public static void Verbose(string caller, params object[] message)
         {
-            DoLog(LogLevel.Info, caller, message);
+            DoLog(LogLevel.Verbose, caller, message);
         }
     }
 }

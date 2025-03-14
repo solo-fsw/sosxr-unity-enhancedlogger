@@ -1,6 +1,6 @@
 {
   "name": "SOSXR.EnhancedLogger.Editor",
-  "rootNamespace": "",
+  "rootNamespace": "SOSXR.EnhancedLogger.Editor",
   "references": [
     "GUID:eb1034696cce04f25a4a7d38d2e0e5a4"
   ],

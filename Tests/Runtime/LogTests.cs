@@ -90,16 +90,16 @@ public class ShowOwnLogs
     [Test]
     public void Info_ShowsInfoLogs()
     {
-        Log.CurrentLogLevel = LogLevel.Info;
+        Log.CurrentLogLevel = LogLevel.Verbose;
 
         var mockName = string.Concat("MockObject_", Random.Range(0, 100));
         var mockObject = new GameObject(mockName);
 
         var message = "This is an info message.";
-        mockObject.Info(message);
+        mockObject.Verbose(message);
 
-        var prefix = Log.GetPrefix(LogLevel.Info);
-        var color = Log.GetColor(LogLevel.Info);
+        var prefix = Log.GetPrefix(LogLevel.Verbose);
+        var color = Log.GetColor(LogLevel.Verbose);
 
         var objectName = $"<color={color}>[{mockObject.name}]{prefix}</color> : ";
 
@@ -182,7 +182,7 @@ public class ShowHigherLogs
     [Test]
     public void Info_ShowsAllLogs()
     {
-        Log.CurrentLogLevel = LogLevel.Info;
+        Log.CurrentLogLevel = LogLevel.Verbose;
 
         var mockName = string.Concat("MockObject_", Random.Range(0, 100));
         var mockObject = new GameObject(mockName);
@@ -215,10 +215,10 @@ public class ShowHigherLogs
         LogAssert.Expect(LogType.Log, $"{successObjectName}{successMessage}\n");
 
         var infoMessage = "This is an info message, which should be logged, because CurrentLogLevel is set to Info.";
-        mockObject.Info(infoMessage);
+        mockObject.Verbose(infoMessage);
 
-        var infoPrefix = Log.GetPrefix(LogLevel.Info);
-        var infoColor = Log.GetColor(LogLevel.Info);
+        var infoPrefix = Log.GetPrefix(LogLevel.Verbose);
+        var infoColor = Log.GetColor(LogLevel.Verbose);
         var infoObjectName = $"<color={infoColor}>[{mockObject.name}]{infoPrefix}</color> : ";
 
         LogAssert.Expect(LogType.Log, $"{infoObjectName}{infoMessage}\n");
@@ -253,7 +253,7 @@ public class SuppressLowerLogs
         var mockObject = new GameObject(mockName);
 
         mockObject.Success("This is a success message.");
-        mockObject.Info("This is an info message.");
+        mockObject.Verbose("This is an info message.");
 
         LogAssert.NoUnexpectedReceived();
     }
@@ -280,7 +280,7 @@ public class SuppressLowerLogs
         mockObject.Success(successMessage);
 
         var infoMessage = "This is an info message, which should be suppressed, because CurrentLogLevel is set to None.";
-        mockObject.Info(infoMessage);
+        mockObject.Verbose(infoMessage);
 
         LogAssert.NoUnexpectedReceived();
     }

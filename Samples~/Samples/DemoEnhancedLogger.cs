@@ -31,18 +31,18 @@ public class DemoEnhancedLogger : MonoBehaviour
 
         Camera.main.Debug("This is a debug message on another object");
 
-        this.Success("This is a success message", "We can do string interpolation", $"It is shown when the log level is set to {Log.CurrentLogLevel} or {LogLevel.Info}, but not when it's set to {LogLevel.None}, {LogLevel.Error}, or {LogLevel.Warning}.");
+        this.Success("This is a success message", "We can do string interpolation", $"It is shown when the log level is set to {Log.CurrentLogLevel} or {LogLevel.Verbose}, but not when it's set to {LogLevel.None}, {LogLevel.Error}, or {LogLevel.Warning}.");
 
         if (otherGameObject != null)
         {
-            otherGameObject.Info("Yet I am showing this Info log..?");
+            otherGameObject.Verbose("Yet I am showing this Info log..?");
         }
         else
         {
             this.Error("The 'OtherGameObject' has not been set!");
         }
 
-        this.Info("Did you know that none of these logs are shown in a Release build?", "They get blocked by the compiler, so they don't slow down your game. Hopefully.");
+        this.Verbose("Did you know that none of these logs are shown in a Release build?", "They get blocked by the compiler, so they don't slow down your game. Hopefully.");
 
         this.Success("However, you can still see them in the Editor, and in a Development build. Hurray :)");
     }

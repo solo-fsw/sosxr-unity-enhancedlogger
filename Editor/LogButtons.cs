@@ -64,9 +64,9 @@ namespace SOSXR.EnhancedLogger
                 Warning();
             }
 
-            if (CreateButton(nameof(Solid)))
+            if (CreateButton(nameof(Info)))
             {
-                Solid();
+                Info();
             }
 
             if (CreateButton(nameof(Debug)))
@@ -79,9 +79,9 @@ namespace SOSXR.EnhancedLogger
                 Success();
             }
 
-            if (CreateButton(nameof(Info)))
+            if (CreateButton(nameof(Verbose)))
             {
-                Info();
+                Verbose();
             }
 
             GUILayout.EndVertical();
@@ -148,10 +148,10 @@ namespace SOSXR.EnhancedLogger
         /// <summary>
         ///     Choose if you want both Warning and Error logs shown.
         /// </summary>
-        [MenuItem(_menuPath + nameof(Solid))]
-        private static void Solid()
+        [MenuItem(_menuPath + nameof(Info))]
+        private static void Info()
         {
-            Log.CurrentLogLevel = LogLevel.Solid;
+            Log.CurrentLogLevel = LogLevel.Info;
             LogLevelEditorPrefs.SaveLogLevel();
         }
 
@@ -181,10 +181,10 @@ namespace SOSXR.EnhancedLogger
         /// <summary>
         ///     Choose if you want to see ALL logs. This is Info, Success, Debug, Warning, and Error logs.
         /// </summary>
-        [MenuItem(_menuPath + nameof(Info))]
-        private static void Info()
+        [MenuItem(_menuPath + nameof(Verbose))]
+        private static void Verbose()
         {
-            Log.CurrentLogLevel = LogLevel.Info;
+            Log.CurrentLogLevel = LogLevel.Verbose;
             LogLevelEditorPrefs.SaveLogLevel();
         }
     }
