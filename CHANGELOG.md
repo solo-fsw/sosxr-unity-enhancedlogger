@@ -6,6 +6,7 @@ The changelog format is based on [Keep a Changelog](https://keepachangelog.com/e
 ## [0.2.2] 02-04-2025
 ### Fixed
 - Bug where Verbose / Info were mixed up in 
+- 
 
 
 ## [0.2.1] 
