@@ -16,15 +16,6 @@ The changelog format is based on [Keep a Changelog](https://keepachangelog.com/e
 - Build LogLevel now follows the last-set Editor LogLevel
 
 
-### Improved
-
-- Created overloads for when using 1-3 messages to avoid needless array allocation. Will only start an array allocation at 4+ messages.
-
-### Changed
-
-- Unity "6000.0"
-- Moved EditorPrefs setter to `Log.cs`
-
 ## [0.2.2] 02-04-2025
 
 ### Fixed
