@@ -47,7 +47,7 @@ namespace SOSXR.EnhancedLogger
             if (!Settings)
             {
                 Settings = ScriptableObject.CreateInstance<EnhancedLoggerSettings>();
-                UnityEngine.Debug.LogWarningFormat("No {nameof(EnhancedLoggerSettings)} found, creating a new one in the Resources folder.");
+                UnityEngine.Debug.LogWarningFormat("No Settings asset found, creating a new one in the Resources folder.");
             }
         }
 
