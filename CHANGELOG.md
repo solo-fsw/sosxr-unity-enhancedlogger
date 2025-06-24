@@ -3,13 +3,36 @@
 All notable changes to this project will be documented in this file.
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [0.3.0] 24-06-2025
+
+### Complete overhaul
+- LogLevel `Debug` is now higher than `Info`. (order: none, error, warning, debug, info, success, verbose)
+- Support GameObject pinging in hierarchy 
+- Supports line number pinging in IDE
+- Cleaner code with just 2 overloads: one for 1 string message, another for multiple (up to four)
+- Can write logs to `.md` file
+- Customize settings in ScriptableObject
+- Supports Unity 6
+- Build LogLevel now follows the last-set Editor LogLevel
+
+
+### Improved
+
+- Created overloads for when using 1-3 messages to avoid needless array allocation. Will only start an array allocation at 4+ messages.
+
+### Changed
+
+- Unity "6000.0"
+- Moved EditorPrefs setter to `Log.cs`
+
 ## [0.2.2] 02-04-2025
+
 ### Fixed
-- Bug where Verbose / Info were mixed up in 
-- 
 
+- Bug where Verbose / Info were mixed up in
+-
 
-## [0.2.1] 
+## [0.2.1]
 
 > ### Package Numbering Change
 > #### Package will now be numbered starting with 0, to better reflect the current status in development (see the official semver information [here](https://semver.org/#spec-item-4)).

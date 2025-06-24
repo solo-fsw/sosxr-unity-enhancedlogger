@@ -21,12 +21,12 @@ public class DemoEnhancedLoggerTwo : MonoBehaviour
             DestroyImmediate(gameObject);
         }
 
-        Log.Error("DisabledObject", "This is still shown even though the gameobject will be destroyed.");
+        Log.Static("This is still shown even though the gameobject will be destroyed.", LogLevel.Verbose);
 
-        Log.Debug("This is a debug message", "I forgot to set the name as the first parameter. It looks a little weird now", "You can see this Log because the current log level is", Log.CurrentLogLevel);
 
-        Log.Success(nameof(gameObject), "This is a success message. It is shown when the log level is set to Success, or Info. But not when it's set to None, Error, or Warning.");
+        Log.Static("This is a debug message. It is shown when the log level is set to Debug, Info, Success, or Verbose. But not when it's set to None, Error, or Warning.");
+        Log.Static("This is a success message. It is shown when the log level is set to Success, or Info. But not when it's set to None, Error, or Warning.", LogLevel.Success);
 
-        Log.Verbose(nameof(DemoEnhancedLoggerTwo), "This is an info message.", "It is only shown when the log level is set to Info");
+        Log.Static("This is an info message. It is only shown when the log level is set to Info", LogLevel.Info);
     }
 }

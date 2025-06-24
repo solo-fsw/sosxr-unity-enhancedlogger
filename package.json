@@ -1,9 +1,9 @@
 {
   "name": "com.sosxr.enhancedlogger",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "displayName": "Enhanced Logger",
   "description": "This is a package that enhances the Unity Debug.Log() function.",
-  "unity": "2021.3",
+  "unity": "6000.0",
   "keywords": [
     "Unity",
     "Debug",

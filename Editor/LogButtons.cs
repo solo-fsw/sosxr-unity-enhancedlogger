@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -64,14 +65,14 @@ namespace SOSXR.EnhancedLogger
                 Warning();
             }
 
-            if (CreateButton(nameof(Info)))
-            {
-                Info();
-            }
-
             if (CreateButton(nameof(Debug)))
             {
                 Debug();
+            }
+
+            if (CreateButton(nameof(Info)))
+            {
+                Info();
             }
 
             if (CreateButton(nameof(Success)))
@@ -112,6 +113,22 @@ namespace SOSXR.EnhancedLogger
         }
 
 
+        [MenuItem("SOSXR/Folders/" + nameof(EnhancedLogger), false, 100)]
+        private static void EnhancedLogger()
+        {
+            var fullPath = Path.Combine(Application.persistentDataPath, "EnhancedLogger");
+
+            if (Directory.Exists(fullPath))
+            {
+                EditorUtility.RevealInFinder(fullPath);
+            }
+            else
+            {
+                UnityEngine.Debug.LogWarning($"Folder not found at path: {fullPath}");
+            }
+        }
+
+
         /// <summary>
         ///     Chose if you want NO logs shown.
         /// </summary>
@@ -119,18 +136,16 @@ namespace SOSXR.EnhancedLogger
         private static void None()
         {
             Log.CurrentLogLevel = LogLevel.None;
-            LogLevelEditorPrefs.SaveLogLevel();
         }
 
 
         /// <summary>
-        ///     Chose if you ONLY want Error logs shown.
+        ///     Chose if you only want Error logs shown.
         /// </summary>
         [MenuItem(_menuPath + nameof(Error))]
         private static void Error()
         {
             Log.CurrentLogLevel = LogLevel.Error;
-            LogLevelEditorPrefs.SaveLogLevel();
         }
 
 
@@ -141,51 +156,47 @@ namespace SOSXR.EnhancedLogger
         private static void Warning()
         {
             Log.CurrentLogLevel = LogLevel.Warning;
-            LogLevelEditorPrefs.SaveLogLevel();
-        }
-
-
-        /// <summary>
-        ///     Choose if you want both Warning and Error logs shown.
-        /// </summary>
-        [MenuItem(_menuPath + nameof(Info))]
-        private static void Info()
-        {
-            Log.CurrentLogLevel = LogLevel.Info;
-            LogLevelEditorPrefs.SaveLogLevel();
         }
 
 
         /// <summary>
         ///     Choose if you want Debug, Warning, and Error logs shown.
+        ///     Default.
         /// </summary>
         [MenuItem(_menuPath + nameof(Debug))]
         private static void Debug()
         {
             Log.CurrentLogLevel = LogLevel.Debug;
-            LogLevelEditorPrefs.SaveLogLevel();
         }
 
 
         /// <summary>
-        ///     Choose if you want Success, Debug, Warning, and Error logs shown.
+        ///     Choose if you want Info, Debug, Warning, and Error logs shown.
+        /// </summary>
+        [MenuItem(_menuPath + nameof(Info))]
+        private static void Info()
+        {
+            Log.CurrentLogLevel = LogLevel.Info;
+        }
+
+
+        /// <summary>
+        ///     Choose if you want Success, Info, Debug, Warning, and Error logs shown.
         /// </summary>
         [MenuItem(_menuPath + nameof(Success))]
         private static void Success()
         {
             Log.CurrentLogLevel = LogLevel.Success;
-            LogLevelEditorPrefs.SaveLogLevel();
         }
 
 
         /// <summary>
-        ///     Choose if you want to see ALL logs. This is Info, Success, Debug, Warning, and Error logs.
+        ///     Choose if you want to see ALL logs. This is Verbose, Success, Info, Debug, Warning, and Error logs.
         /// </summary>
         [MenuItem(_menuPath + nameof(Verbose))]
         private static void Verbose()
         {
             Log.CurrentLogLevel = LogLevel.Verbose;
-            LogLevelEditorPrefs.SaveLogLevel();
         }
     }
 }

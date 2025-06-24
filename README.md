@@ -22,30 +22,26 @@ A utility class for logging messages with customisable log levels and colours in
 ## Introduction
 
 This Unity package provides a flexible and customizable logging utility named `Log`. It allows you to log messages with
-different log levels (Error, Warning, Debug, Success, Info) and customize the appearance of log messages with colors.
+different log levels (Error, Warning, Debug, Info, Success, and Verbose) and customize the appearance of log messages with colors.
 The utility is designed to be easy to integrate into your Unity projects.
 
 ## Features
 
-- Log messages with various log levels, thereby suppressing ones you don't want to see.
-- Customize log message appearance with colors (if you've cloned the project instead of using the package manager, you
-  can change the colors in the `Log.cs` file).
-- Unity Editor and Development Build aware. It will suppress your logs in a production build, making it a cheap solution
+- Log messages with various log levels
+- Suppress ones you don't want to see.
+- Runs logs only in Unity Editor and Development Build. It will suppress your logs in a Production build, making it a cheap solution
   for logging, and the best of both worlds: all the logging you could want in development, and none of the overhead in
   production.
 - Click to go to the source of the log message, both the GameObject where the call came from, and the code + line number
-  it is referring to (although not perfect, see Downsides)
+  it is referring to.
+- Customize log message appearance with colors (see the `EnhancedLoggerSettings` asset).
 
 ## Downsides
 
-- Unfortunately you can't click on the log message itself, but you can click on the second line of the log to go to the
-  line number in the class (Otherwise you'll go to the `Log.cs` class instead). The first lines in the Console are
-  reserved for the Log utility. Not so handy when you want to click to the code that generated the log message. If you
-  know how to fix this, please let me know.
-- It can only find the GameObject that called the Log message if it is a MonoBehaviour. If you call the `Log` directly (
-  as you would in a static class for instance), it will not be able to click to find the GameObject.
-- You need to copy the Demo files into your normal Asset folder to use the Demo scene.
-  See [this explanation here as to why](https://forum.unity.com/threads/it-is-not-allowed-to-open-a-scene-in-a-read-only-package-why.1148036/).
+- When using the Static version (`Log.Static("lala");`) you can't click on the log message itself, but you can click on the second line of the log to go to the
+  line number in the class (Otherwise you'll go to the `Log.cs` class instead).
+- It can only find the GameObject that called the Log message if it is a MonoBehaviour. If you call the `Log` directly (as you would in a static class for instance), it will not be able to click to find the GameObject.
+- You need to copy the Demo files into your normal Asset folder to use the Demo scene. See [this explanation here as to why](https://forum.unity.com/threads/it-is-not-allowed-to-open-a-scene-in-a-read-only-package-why.1148036/).
 
 ## Installation
 
@@ -59,10 +55,13 @@ The utility is designed to be easy to integrate into your Unity projects.
    `.git` at the end).
 6. Click the `Add` button.
 
-## Manual Installation
+### Manual Installation
 
-If you prefer manual installation (also allowing you more customizability), clone or
-download [the repository](https://github.com/mrstruijk/EnhancedLogger) to your Unity project.
+If you prefer manual installation (also allowing you more customizability), clone or download [the repository](https://github.com/mrstruijk/EnhancedLogger) to your Unity project.
+
+## Dependencies
+
+Does not have any direct dependencies, but does work well with the [In-Game Debug Console](https://github.com/solo-fsw/sosxr-unity-ingamedebugconsole), originally created by [yasirkula](https://github.com/yasirkula/UnityIngameDebugConsole).
 
 # Usage
 
@@ -70,36 +69,48 @@ download [the repository](https://github.com/mrstruijk/EnhancedLogger) to your U
 
 - Error
 - Warning
-- Info
 - Debug
+- Info
 - Success
 - Verbose
 
 Each LogLevel shows the logs of the selected LogLevel and all logs with a higher LogLevel. For example, if you select
 `Warning`, you will see both `Warning`, and `Error` logs. Selecting `Verbose` will show all logs. The default LogLevel
-is `Debug` (showing `Debug`, `Info`, `Warning`, and `Error` logs).
+is `Info` (also showing `Debug`, `Warning`, and `Error` logs).
 
 ### Opinionated Usage
 
 `Debug` is used only for when you're working on a specific module. Put in as many logs as you want, to see how the thing
-you're building is progressing. Then, when things 'settle down' and things start working as intended: move (almost) all
-those `Debug` logs to the appropriate higher or lower level. By the end of each day / sprint / module, `Debug` should be
+you're building is progressing. Then, when things 'settle down' and it starts working as intended: either move the
+ `Debug` logs to the appropriate higher or lower level, or delete them. By the end of each day / sprint / module, `Debug` should be
 empty again.
 
-`Info` is placed between `Debug` and `Warning` in the hierarchy. With `Verbose` there's too many other messages that are
-displaying, while a `Warning` is often also not what I was looking for. A lot of the messages were of things that were
-simply happening, without them needing to warn me of things.
+#### `Info` and `Success`
 
-## Setting Log Levels
+With `Verbose` there's too many other messages that are displaying, while a `Warning` is often also not what I was looking for. A lot of the messages were of things that were simply happening, without them needing to warn me of things. That's what the `Info` level is made for. Similarly, but only for the good stuff: `Success`.
+
+## Settings
+
+Settings can be found in a ScriptableObject found in the Resources folder called `EnhancedLoggerSettings`.
+
+### LogLevel
 
 In the Scene view, select the LogLevel you want to use. This will determine which log messages are displayed in the
 Console. It shows the logs of the selected LogLevel and all logs with a higher LogLevel.
 
-Alternatively you can set the LogLevel in the Menu bar at SOSXR > EnhancedLogger.
+Alternatively you can set the LogLevel in the Menu bar at SOSXR > EnhancedLogger, or via the aforementioned Settings object.
+
+### Colors
+
+You can set the color for each log level in the `EnhancedLoggerSettings` object.
+
+### Prefix
+
+Prefixes, such as `[DEBUG]` can be set in the `EnhancedLoggerSettings` object. Alternatively: leave blank.
 
 ## Log Messages
 
-To add logs to you scripts, see the example below, and the Samples folder for more examples.
+To add logs to your scripts, see the example below, and the Samples folder for more examples.
 
 ```csharp
 using UnityEngine;
@@ -122,18 +133,18 @@ public class Example : MonoBehaviour
         
         // Or from the static class:
         // These are useful when the object you're calling the Log from can be destroyed. Be careful with the second one, thay may cause a NullReferenceException anyway.
-        Log.Info("Provide a name here", "This is an info message.");
-        Log.Error(nameof(SomeObscureClass), "This is an error message.");
+        Log.Static("This is an info message.", LogLevel.Info);
+        Log.Static("This is a debug  message.");
     }
 }
 ```
 
 It also works on static classes, or classes that are not derived from `MonoBehaviour`. Just use the `Log` class
-directly (e.g. `Log.Debug("This is a debug message.");`).
+directly (e.g. `Log.Static("This is a debug message.");`).
 
 ## Tests
 
-You can find tests in the LogTests.cs file. To run the tests, open the Unity Test Runner and execute the tests from
+You can find tests in the `LogTests.cs` file. To run the tests, open the Unity Test Runner and execute the tests from
 there.
 
 ## Contributing

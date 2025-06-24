@@ -1,3 +1,5 @@
+using System.IO;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 
@@ -14,33 +16,48 @@ namespace SOSXR.EnhancedLogger
     /// </summary>
     public static class Log
     {
-        private const string ErrorPrefix = "<b>[!ERROR!]</b>";
-        private const string WarningPrefix = "<b>[WARNING]</b>";
-        private const string InfoPrefix = "";
-        private const string DebugPrefix = "<DEBUG>";
-        private const string SuccessPrefix = "";
-        private const string VerbosePrefix = "";
-
-        private const string ErrorColor = "red";
-        private const string WarningColor = "yellow";
-        private const string InfoColor = "lightblue";
-        private const string DebugColor = "orange";
-        private const string SuccessColor = "green";
-        private const string VerboseColor = "white";
-
-
-        public static LogLevel CurrentLogLevel = LogLevel.Debug;
-
-
-        private static string Color(this string myString, string color)
+        public static LogLevel CurrentLogLevel
         {
-            #if UNITY_EDITOR
-            return $"<color={color}>{myString}</color>";
-            #elif DEVELOPMENT_BUILD
-            return myString;
-            #else
-            return null;
-            #endif
+            get
+            {
+                LoadSettingsAsset();
+
+                return Settings.CurrentLogLevel;
+            }
+            set
+            {
+                LoadSettingsAsset();
+
+                Settings.CurrentLogLevel = value;
+            }
+        }
+
+        public static EnhancedLoggerSettings Settings;
+
+
+        private static void LoadSettingsAsset()
+        {
+            if (Settings)
+            {
+                return;
+            }
+
+            Settings = Resources.Load<EnhancedLoggerSettings>(nameof(Settings));
+
+            if (!Settings)
+            {
+                Settings = ScriptableObject.CreateInstance<EnhancedLoggerSettings>();
+                UnityEngine.Debug.LogWarningFormat("No {nameof(EnhancedLoggerSettings)} found, creating a new one in the Resources folder.");
+            }
+        }
+
+
+        private static string Color(this string message, Color color)
+        {
+            Color32 c = color;
+            var hex = $"#{c.r:X2}{c.g:X2}{c.b:X2}";
+
+            return $"<color={hex}>{message}</color>";
         }
 
 
@@ -48,218 +65,373 @@ namespace SOSXR.EnhancedLogger
         {
             return logLevel switch
                    {
-                       LogLevel.Error => ErrorPrefix,
-                       LogLevel.Warning => WarningPrefix,
-                       LogLevel.Info => InfoPrefix,
-                       LogLevel.Debug => DebugPrefix,
-                       LogLevel.Success => SuccessPrefix,
-                       _ => VerbosePrefix
+                       LogLevel.Error => Settings.ErrorPrefix,
+                       LogLevel.Warning => Settings.WarningPrefix,
+                       LogLevel.Debug => Settings.DebugPrefix,
+                       LogLevel.Info => Settings.InfoPrefix,
+                       LogLevel.Success => Settings.SuccessPrefix,
+                       _ => Settings.VerbosePrefix
                    };
         }
 
 
-        public static string GetColor(LogLevel logLevel)
+        public static Color GetColor(LogLevel logLevel)
         {
             return logLevel switch
                    {
-                       LogLevel.Error => ErrorColor,
-                       LogLevel.Warning => WarningColor,
-                       LogLevel.Info => InfoColor,
-                       LogLevel.Debug => DebugColor,
-                       LogLevel.Success => SuccessColor,
-                       _ => VerboseColor
+                       LogLevel.Error => Settings.ErrorColor,
+                       LogLevel.Warning => Settings.WarningColor,
+                       LogLevel.Debug => Settings.DebugColor,
+                       LogLevel.Info => Settings.InfoColor,
+                       LogLevel.Success => Settings.SuccessColor,
+                       _ => Settings.VerboseColor
                    };
         }
 
 
-        /// <summary>
-        ///     Logs are not shown in the release build
-        ///     Theoretically, this should be less expensive than the Debug.Log, over which I have no control
-        /// </summary>
-        /// <param name="logLevel"></param>
-        /// <param name="caller"></param>
-        /// <param name="message"></param>
-        private static void DoLog(LogLevel logLevel, object caller, params object[] message)
+        [RuntimeInitializeOnLoadMethod]
+        public static void ReportLogLevel()
         {
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            if (CurrentLogLevel < logLevel)
-            {
-                return;
-            }
-
-            var objectName = "";
-
-            if (caller is Object unityObject)
-            {
-                if (unityObject == null || string.IsNullOrEmpty(unityObject.name))
-                {
-                    UnityEngine.Debug.LogWarningFormat("Cannot use the name of this object");
-                    objectName = "[" + "NAME_LESS" + "]";
-                }
-                else
-                {
-                    objectName = "[" + unityObject.name + "]";
-                }
-            }
-            else
-            {
-                objectName = "[" + caller + "]";
-            }
-
-            var prefix = GetPrefix(logLevel);
-            var color = GetColor(logLevel);
-
-            if (!string.IsNullOrEmpty(prefix))
-            {
-                objectName = string.Concat(objectName, prefix);
-            }
-
-            UnityEngine.Debug.Log($"{objectName.Color(color)} : {string.Join(" : ", message)}\n", caller as Object);
+            #if DEVELOPMENT_BUILD
+                UnityEngine.Debug.Log($"Current Log Level: {CurrentLogLevel}");
             #endif
         }
 
 
         /// <summary>
-        ///     Designed for catastrophic level error-logging.
-        ///     The logger defaults to show Error messages in the editor / development build (Debug and up).
+        ///     Logs are not shown in the Release build
+        ///     Theoretically, this should be less expensive than the Debug.Log(), over which I have no control.
         /// </summary>
-        /// <param name="caller"></param>
+        /// <param name="logLevel"></param>
+        /// <param name="callerObject"></param>
         /// <param name="message"></param>
-        public static void Error(this Object caller, params object[] message)
+        private static void Console(LogLevel logLevel, string message, Object callerObject = null, string callerName = "", string callerFilePath = "", int callerLineNumber = 0)
         {
-            DoLog(LogLevel.Error, caller, message);
+            if (!ShouldShowLogs(logLevel))
+            {
+                return;
+            }
+
+            var location = $"{Path.GetFileNameWithoutExtension(callerFilePath)} ({callerName} : {callerLineNumber})";
+
+            var postFix = string.Empty;
+
+            if (callerObject)
+            {
+                postFix = " on " + callerObject?.name;
+            }
+
+            var messageStart = $"{GetPrefix(logLevel)} | {location}{postFix}";
+
+            UnityEngine.Debug.LogFormat(LogType.Log, LogOption.None, callerObject, $"{messageStart.Color(GetColor(logLevel))} : {message}\n");
+
+            if (Settings.WriteToFile)
+            {
+                WriteToFile.Log($"{messageStart} : {message}");
+            }
+        }
+
+
+        private static bool ShouldShowLogs(LogLevel logLevel)
+        {
+            #if !UNITY_EDITOR && !DEVELOPMENT_BUILD
+                return false; // Logs are not shown in the Release build
+            #endif
+
+            return CurrentLogLevel >= logLevel; // Only show logs that are equal to or above the current log level
         }
 
 
         /// <summary>
-        ///     Designed for catastrophic level error-logging
-        ///     The logger defaults to show Error messages in the editor / development build (Debug and up).
+        ///     Designed for catastrophic errors that break the game.
         /// </summary>
         /// <param name="caller"></param>
         /// <param name="message"></param>
-        public static void Error(string caller, params object[] message)
+        /// <param name="callerLineNumber"></param>
+        /// <param name="callerName"></param>
+        /// <param name="callerFilePath"></param>
+        public static void Error(this Object caller, string message, [CallerLineNumber] int callerLineNumber = 0, [CallerMemberName] string callerName = "", [CallerFilePath] string callerFilePath = "")
         {
-            DoLog(LogLevel.Error, caller, message);
+            Console(LogLevel.Error, message, caller, callerName, callerFilePath, callerLineNumber);
         }
 
 
         /// <summary>
-        ///     Designed for warnings which need to be fixed, but do not break the game.
-        ///     The logger defaults to show Warning messages in the editor / development build (Debug and up).
+        ///     Designed for catastrophic errors that break the game.
+        ///     Overload for multiple messages.
         /// </summary>
         /// <param name="caller"></param>
         /// <param name="message"></param>
-        public static void Warning(this Object caller, params object[] message)
+        /// <param name="message2"></param>
+        /// <param name="message3"></param>
+        /// <param name="message4"></param>
+        /// <param name="callerLineNumber"></param>
+        /// <param name="callerName"></param>
+        /// <param name="callerFilePath"></param>
+        public static void Error(this Object caller, string message, string message2, string message3 = "", string message4 = "", [CallerLineNumber] int callerLineNumber = 0, [CallerMemberName] string callerName = "", [CallerFilePath] string callerFilePath = "")
         {
-            DoLog(LogLevel.Warning, caller, message);
+            var combinedMessage = StringCombiner(message, message2, message3, message4);
+            Console(LogLevel.Error, combinedMessage, caller, callerName, callerFilePath, callerLineNumber);
         }
 
 
         /// <summary>
-        ///     Designed for warnings which need to be fixed, but do not break the game
-        ///     The logger defaults to show Warning messages in the editor / development build (Debug and up).
+        ///     Designed for severe issues that should not be ignored.
         /// </summary>
         /// <param name="caller"></param>
         /// <param name="message"></param>
-        public static void Warning(string caller, params object[] message)
+        /// <param name="callerLineNumber"></param>
+        /// <param name="callerName"></param>
+        /// <param name="callerFilePath"></param>
+        public static void Warning(this Object caller, string message, [CallerLineNumber] int callerLineNumber = 0, [CallerMemberName] string callerName = "", [CallerFilePath] string callerFilePath = "")
         {
-            DoLog(LogLevel.Warning, caller, message);
+            Console(LogLevel.Warning, message, caller, callerName, callerFilePath, callerLineNumber);
         }
 
 
         /// <summary>
-        ///     Designed for general information messages.
-        ///     The logger defaults to show Info messages in the editor / development build (because it defaults to Debug and up).
+        ///     Designed for severe issues that should not be ignored.
+        ///     Overload for multiple messages.
         /// </summary>
         /// <param name="caller"></param>
         /// <param name="message"></param>
-        public static void Info(this Object caller, params object[] message)
+        /// <param name="message2"></param>
+        /// <param name="message3"></param>
+        /// <param name="message4"></param>
+        /// <param name="callerLineNumber"></param>
+        /// <param name="callerName"></param>
+        /// <param name="callerFilePath"></param>
+        public static void Warning(this Object caller, string message, string message2, string message3 = "", string message4 = "", [CallerLineNumber] int callerLineNumber = 0, [CallerMemberName] string callerName = "", [CallerFilePath] string callerFilePath = "")
         {
-            DoLog(LogLevel.Info, caller, message);
+            var combinedMessage = StringCombiner(message, message2, message3, message4);
+            Console(LogLevel.Warning, combinedMessage, caller, callerName, callerFilePath, callerLineNumber);
         }
 
 
         /// <summary>
-        ///     Designed for general information messages.
-        ///     The logger defaults to show Info messages in the editor / development build (because it defaults to Debug and up).
+        ///     Designed for temporary messages (for instance during development of a module).
+        ///     Once development is completed, these logs should be moved to the correct LogLevel.
         /// </summary>
         /// <param name="caller"></param>
         /// <param name="message"></param>
-        public static void Info(string caller, params object[] message)
+        /// <param name="callerLineNumber"></param>
+        /// <param name="callerName"></param>
+        /// <param name="callerFilePath"></param>
+        public static void Debug(this Object caller, string message, [CallerLineNumber] int callerLineNumber = 0, [CallerMemberName] string callerName = "", [CallerFilePath] string callerFilePath = "")
         {
-            DoLog(LogLevel.Info, caller, message);
+            Console(LogLevel.Debug, message, caller, callerName, callerFilePath, callerLineNumber);
         }
 
 
         /// <summary>
-        ///     Designed for temporary debug messages.
-        ///     The Logger defaults to show Debug messages in the editor / development build.
+        ///     Designed for temporary messages (for instance during development of a module).
+        ///     Once development is completed, these logs should be moved to the correct LogLevel.
+        ///     Overload for multiple messages.
         /// </summary>
         /// <param name="caller"></param>
         /// <param name="message"></param>
-        public static void Debug(this Object caller, params object[] message)
+        /// <param name="message2"></param>
+        /// <param name="message3"></param>
+        /// <param name="message4"></param>
+        /// <param name="callerLineNumber"></param>
+        /// <param name="callerName"></param>
+        /// <param name="callerFilePath"></param>
+        public static void Debug(this Object caller, string message, string message2, string message3 = "", string message4 = "", [CallerLineNumber] int callerLineNumber = 0, [CallerMemberName] string callerName = "", [CallerFilePath] string callerFilePath = "")
         {
-            DoLog(LogLevel.Debug, caller, message);
+            var combinedMessage = StringCombiner(message, message2, message3, message4);
+            Console(LogLevel.Debug, combinedMessage, caller, callerName, callerFilePath, callerLineNumber);
         }
 
 
         /// <summary>
-        ///     Designed for temporary debug messages.
-        ///     The Logger defaults to show Debug messages in the editor / development build.
+        ///     Designed for general information messages that are not errors or warnings, but are generally useful to know.
         /// </summary>
         /// <param name="caller"></param>
         /// <param name="message"></param>
-        public static void Debug(string caller, params object[] message)
+        /// <param name="callerLineNumber"></param>
+        /// <param name="callerName"></param>
+        /// <param name="callerFilePath"></param>
+        public static void Info(this Object caller, string message, [CallerLineNumber] int callerLineNumber = 0, [CallerMemberName] string callerName = "", [CallerFilePath] string callerFilePath = "")
         {
-            DoLog(LogLevel.Debug, caller, message);
+            Console(LogLevel.Info, message, caller, callerName, callerFilePath, callerLineNumber);
         }
 
 
         /// <summary>
-        ///     Designed to note when something does work. Hurray!
-        ///     By default these messages are not shown in the editor / development build, because the Log defaults to Debug.
+        ///     Designed for general information messages that are not errors or warnings, but are generally useful to know.
+        ///     Overload for multiple messages.
         /// </summary>
         /// <param name="caller"></param>
         /// <param name="message"></param>
-        public static void Success(this Object caller, params object[] message)
+        /// <param name="message2"></param>
+        /// <param name="message3"></param>
+        /// <param name="message4"></param>
+        /// <param name="callerLineNumber"></param>
+        /// <param name="callerName"></param>
+        /// <param name="callerFilePath"></param>
+        public static void Info(this Object caller, string message, string message2, string message3 = "", string message4 = "", [CallerLineNumber] int callerLineNumber = 0, [CallerMemberName] string callerName = "", [CallerFilePath] string callerFilePath = "")
         {
-            DoLog(LogLevel.Success, caller, message);
+            var combinedMessage = StringCombiner(message, message2, message3, message4);
+            Console(LogLevel.Info, combinedMessage, caller, callerName, callerFilePath, callerLineNumber);
         }
 
 
         /// <summary>
-        ///     Designed to note when something does work. Party.
-        ///     By default these messages are not shown in the editor / development build, because the Log defaults to Debug.
+        ///     Designed to show successful operations or states.
         /// </summary>
         /// <param name="caller"></param>
         /// <param name="message"></param>
-        public static void Success(string caller, params object[] message)
+        /// <param name="callerLineNumber"></param>
+        /// <param name="callerName"></param>
+        /// <param name="callerFilePath"></param>
+        public static void Success(this Object caller, string message, [CallerLineNumber] int callerLineNumber = 0, [CallerMemberName] string callerName = "", [CallerFilePath] string callerFilePath = "")
         {
-            DoLog(LogLevel.Success, caller, message);
+            Console(LogLevel.Success, message, caller, callerName, callerFilePath, callerLineNumber);
         }
 
 
         /// <summary>
-        ///     Designed for the lowest level of persistent Logging. Only shown in Full / Info logging mode
-        ///     By default these messages are not shown in the editor / development build, because the Log defaults to Debug.
+        ///     Designed to show successful operations or states.
+        ///     Overload for multiple messages.
         /// </summary>
         /// <param name="caller"></param>
         /// <param name="message"></param>
-        public static void Verbose(this Object caller, params object[] message)
+        /// <param name="message2"></param>
+        /// <param name="message3"></param>
+        /// <param name="message4"></param>
+        /// <param name="callerLineNumber"></param>
+        /// <param name="callerName"></param>
+        /// <param name="callerFilePath"></param>
+        public static void Success(this Object caller, string message, string message2, string message3 = "", string message4 = "", [CallerLineNumber] int callerLineNumber = 0, [CallerMemberName] string callerName = "", [CallerFilePath] string callerFilePath = "")
         {
-            DoLog(LogLevel.Verbose, caller, message);
+            var combinedMessage = StringCombiner(message, message2, message3, message4);
+            Console(LogLevel.Success, combinedMessage, caller, callerName, callerFilePath, callerLineNumber);
         }
 
 
         /// <summary>
-        ///     Designed for the lowest level of persistent Logging. Only shown in Full / Info logging mode
-        ///     By default these messages are not shown in the editor / development build, because the Log defaults to Debug.
+        ///     Designed for detailed information that is useful for debugging or understanding the flow of the application.
+        ///     Often this shows information that is too much for the Info log level.
         /// </summary>
         /// <param name="caller"></param>
         /// <param name="message"></param>
-        public static void Verbose(string caller, params object[] message)
+        /// <param name="callerLineNumber"></param>
+        /// <param name="callerName"></param>
+        /// <param name="callerFilePath"></param>
+        public static void Verbose(this Object caller, string message, [CallerLineNumber] int callerLineNumber = 0, [CallerMemberName] string callerName = "", [CallerFilePath] string callerFilePath = "")
         {
-            DoLog(LogLevel.Verbose, caller, message);
+            Console(LogLevel.Verbose, message, caller, callerName, callerFilePath, callerLineNumber);
+        }
+
+
+        /// <summary>
+        ///     Designed for detailed information that is useful for debugging or understanding the flow of the application.
+        ///     Often this shows information that is too much for the Info log level.
+        ///     Overload for multiple messages.
+        /// </summary>
+        /// <param name="caller"></param>
+        /// <param name="message"></param>
+        /// <param name="message2"></param>
+        /// <param name="message3"></param>
+        /// <param name="message4"></param>
+        /// <param name="callerLineNumber"></param>
+        /// <param name="callerName"></param>
+        /// <param name="callerFilePath"></param>
+        public static void Verbose(this Object caller, string message, string message2, string message3 = "", string message4 = "", [CallerLineNumber] int callerLineNumber = 0, [CallerMemberName] string callerName = "", [CallerFilePath] string callerFilePath = "")
+        {
+            var combinedMessage = StringCombiner(message, message2, message3, message4);
+            Console(LogLevel.Verbose, combinedMessage, caller, callerName, callerFilePath, callerLineNumber);
+        }
+
+
+        /// <summary>
+        ///     For when you want to set your own log level. Defaults to Debug.
+        /// </summary>
+        /// <param name="caller"></param>
+        /// <param name="message"></param>
+        /// <param name="logLevel"></param>
+        /// <param name="callerLineNumber"></param>
+        /// <param name="callerName"></param>
+        /// <param name="callerFilePath"></param>
+        public static void Console(this Object caller, string message, LogLevel logLevel = LogLevel.Debug, [CallerLineNumber] int callerLineNumber = 0, [CallerMemberName] string callerName = "", [CallerFilePath] string callerFilePath = "")
+        {
+            Console(logLevel, message, caller, callerName, callerFilePath, callerLineNumber);
+        }
+
+
+        /// <summary>
+        ///     For when you want to set your own log level. Defaults to Debug.
+        ///     Overload for multiple messages.
+        /// </summary>
+        /// <param name="caller"></param>
+        /// <param name="message"></param>
+        /// <param name="message2"></param>
+        /// <param name="message3"></param>
+        /// <param name="message4"></param>
+        /// <param name="logLevel"></param>
+        /// <param name="callerLineNumber"></param>
+        /// <param name="callerName"></param>
+        /// <param name="callerFilePath"></param>
+        public static void Console(this Object caller, string message, string message2, string message3 = "", string message4 = "", LogLevel logLevel = LogLevel.Debug, [CallerLineNumber] int callerLineNumber = 0, [CallerMemberName] string callerName = "", [CallerFilePath] string callerFilePath = "")
+        {
+            var combinedMessage = StringCombiner(message, message2, message3, message4);
+            Console(logLevel, combinedMessage, caller, callerName, callerFilePath, callerLineNumber);
+        }
+
+
+        /// <summary>
+        ///     Use when calling logs from static methods or when the caller is not an Object.
+        ///     However, it loses the ability to click in the console to go to the line of code that called the log, and the GameObject in the Hierarchy that called it.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="logLevel"></param>
+        /// <param name="callerLineNumber"></param>
+        /// <param name="callerName"></param>
+        /// <param name="callerFilePath"></param>
+        public static void Static(string message, LogLevel logLevel = LogLevel.Debug, [CallerLineNumber] int callerLineNumber = 0, [CallerMemberName] string callerName = "", [CallerFilePath] string callerFilePath = "")
+        {
+            Console(logLevel, message, null, callerName, callerFilePath, callerLineNumber);
+        }
+
+
+        /// <summary>
+        ///     Use when calling logs from static methods or when the caller is not an Object.
+        ///     However, it loses the ability to click in the console to go to the line of code that called the log, and the GameObject in the Hierarchy that called it.
+        ///     Overload for multiple messages.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="message2"></param>
+        /// <param name="message3"></param>
+        /// <param name="message4"></param>
+        /// <param name="logLevel"></param>
+        /// <param name="callerLineNumber"></param>
+        /// <param name="callerName"></param>
+        /// <param name="callerFilePath"></param>
+        public static void Static(string message, string message2, string message3 = "", string message4 = "", LogLevel logLevel = LogLevel.Debug, [CallerLineNumber] int callerLineNumber = 0, [CallerMemberName] string callerName = "", [CallerFilePath] string callerFilePath = "")
+        {
+            var combinedMessage = StringCombiner(message, message2, message3, message4);
+            Console(logLevel, combinedMessage, null, callerName, callerFilePath, callerLineNumber);
+        }
+
+
+        private static string StringCombiner(string message, string message2 = "", string message3 = "", string message4 = "")
+        {
+            if (!string.IsNullOrEmpty(message4))
+            {
+                return string.Join(" : ", message, message2, message3, message4);
+            }
+
+            if (!string.IsNullOrEmpty(message3))
+            {
+                return string.Join(" : ", message, message2, message3);
+            }
+
+            if (!string.IsNullOrEmpty(message2))
+            {
+                return string.Join(" : ", message, message2);
+            }
+
+            return message;
         }
     }
 }
