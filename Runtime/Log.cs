@@ -1,5 +1,6 @@
 using System.IO;
 using System.Runtime.CompilerServices;
+using UnityEditor;
 using UnityEngine;
 
 
@@ -22,32 +23,44 @@ namespace SOSXR.EnhancedLogger
             {
                 LoadSettingsAsset();
 
-                return Settings.CurrentLogLevel;
+                return EnhancedLoggerSettings.CurrentLogLevel;
             }
             set
             {
                 LoadSettingsAsset();
 
-                Settings.CurrentLogLevel = value;
+                EnhancedLoggerSettings.CurrentLogLevel = value;
             }
         }
 
-        public static EnhancedLoggerSettings Settings;
+        public static EnhancedLoggerSettings EnhancedLoggerSettings;
 
 
         private static void LoadSettingsAsset()
         {
-            if (Settings)
+            if (EnhancedLoggerSettings)
             {
                 return;
             }
 
-            Settings = Resources.Load<EnhancedLoggerSettings>(nameof(Settings));
+            EnhancedLoggerSettings = Resources.Load<EnhancedLoggerSettings>(nameof(EnhancedLoggerSettings));
 
-            if (!Settings)
+            if (!EnhancedLoggerSettings)
             {
-                Settings = ScriptableObject.CreateInstance<EnhancedLoggerSettings>();
-                UnityEngine.Debug.LogWarningFormat("No Settings asset found, creating a new one in the Resources folder.");
+                var settingsFolder = "Assets/_SOSXR/Resources";
+                var assetPath = $"{settingsFolder}/{nameof(EnhancedLoggerSettings)}.asset";
+
+                // Create Resources folder if it doesn't exist
+                if (!Directory.Exists(settingsFolder))
+                {
+                    Directory.CreateDirectory(settingsFolder);
+                }
+
+                // Create the settings asset if it doesn't exist, in the settingsPath
+                EnhancedLoggerSettings = ScriptableObject.CreateInstance<EnhancedLoggerSettings>();
+                AssetDatabase.CreateAsset(EnhancedLoggerSettings, assetPath);
+
+                UnityEngine.Debug.LogWarningFormat($"No Settings asset found, creating a new one in the Resources folder at {assetPath}.");
             }
         }
 
@@ -65,12 +78,12 @@ namespace SOSXR.EnhancedLogger
         {
             return logLevel switch
                    {
-                       LogLevel.Error => Settings.ErrorPrefix,
-                       LogLevel.Warning => Settings.WarningPrefix,
-                       LogLevel.Debug => Settings.DebugPrefix,
-                       LogLevel.Info => Settings.InfoPrefix,
-                       LogLevel.Success => Settings.SuccessPrefix,
-                       _ => Settings.VerbosePrefix
+                       LogLevel.Error => EnhancedLoggerSettings.ErrorPrefix,
+                       LogLevel.Warning => EnhancedLoggerSettings.WarningPrefix,
+                       LogLevel.Debug => EnhancedLoggerSettings.DebugPrefix,
+                       LogLevel.Info => EnhancedLoggerSettings.InfoPrefix,
+                       LogLevel.Success => EnhancedLoggerSettings.SuccessPrefix,
+                       _ => EnhancedLoggerSettings.VerbosePrefix
                    };
         }
 
@@ -79,12 +92,12 @@ namespace SOSXR.EnhancedLogger
         {
             return logLevel switch
                    {
-                       LogLevel.Error => Settings.ErrorColor,
-                       LogLevel.Warning => Settings.WarningColor,
-                       LogLevel.Debug => Settings.DebugColor,
-                       LogLevel.Info => Settings.InfoColor,
-                       LogLevel.Success => Settings.SuccessColor,
-                       _ => Settings.VerboseColor
+                       LogLevel.Error => EnhancedLoggerSettings.ErrorColor,
+                       LogLevel.Warning => EnhancedLoggerSettings.WarningColor,
+                       LogLevel.Debug => EnhancedLoggerSettings.DebugColor,
+                       LogLevel.Info => EnhancedLoggerSettings.InfoColor,
+                       LogLevel.Success => EnhancedLoggerSettings.SuccessColor,
+                       _ => EnhancedLoggerSettings.VerboseColor
                    };
         }
 
@@ -125,7 +138,7 @@ namespace SOSXR.EnhancedLogger
 
             UnityEngine.Debug.LogFormat(LogType.Log, LogOption.None, callerObject, $"{messageStart.Color(GetColor(logLevel))} : {message}\n");
 
-            if (Settings.WriteToFile)
+            if (EnhancedLoggerSettings.WriteToFile)
             {
                 WriteToFile.Log($"{messageStart} : {message}");
             }
