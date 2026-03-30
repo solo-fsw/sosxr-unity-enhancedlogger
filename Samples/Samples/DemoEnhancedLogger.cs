@@ -9,8 +9,8 @@ using UnityEngine;
 /// </summary>
 public class DemoEnhancedLogger : MonoBehaviour
 {
-    [Header("Don't flick this switch")]
-    [SerializeField] private bool m_destroyThisGameObject = false;
+    [Header("Don't flick this switch")] [SerializeField]
+    private bool m_destroyThisGameObject;
 
     [Header("You can call logs unto other objects")]
     public GameObject otherGameObject;

@@ -3,18 +3,63 @@
 All notable changes to this project will be documented in this file.
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.0.0] - 2025-03-30
+
+### Added
+
+- Comprehensive test suite with 25+ tests covering all log levels, static methods, multiple message overloads, and edge cases
+- Test isolation with SetUp/TearDown methods for proper cleanup
+- Static method tests for `Log.Static()` API
+- Multiple message overload tests for 2-4 parameter variants
+- Edge case tests for null messages, empty strings, and brace escaping
+
+### Fixed
+
+- **Critical**: Fixed null reference exceptions in production builds when settings asset is missing
+- Added null-safe fallbacks for `CurrentLogLevel`, `GetPrefix()`, and `GetColor()` with sensible defaults
+- Fixed null message handling in `Console()` method
+- Fixed test expectations to match actual output format
+- Replaced non-deterministic `Random.Range` with deterministic test data
+- Enhanced markdown escaping in file logging to prevent injection attacks
+- Fixed test naming mismatches (e.g., `Info_ShowsInfoLogs` now correctly tests Info level)
+
+### Security
+
+- Improved `EscapeMarkdown()` to wrap messages in code blocks, preventing markdown injection
+- All markdown special characters now safely rendered in log files
+
+### Changed
+
+- Renamed test fixtures for clarity: `ShowOwnLogs`, `ShowHigherPriorityLogs`, `SuppressLowerPriorityLogs`
+- Tests now properly clean up GameObjects after each test
+
+### Breaking Changes
+
+- None. This is the first stable release.
+
+### Migration Guide
+
+- **From 0.4.0 or earlier**: No migration required. All changes are backward compatible.
+
+## [0.4.0] - 2025-03-29
+
+### Fixed
+
+- Added assembly definition to Samples
+- Fixed string formatting issue when working with char types
+
 ## [0.3.0] 24-06-2025
 
 ### Complete overhaul
+
 - LogLevel `Debug` is now higher than `Info`. (order: none, error, warning, debug, info, success, verbose)
-- Support GameObject pinging in hierarchy 
+- Support GameObject pinging in hierarchy
 - Supports line number pinging in IDE
 - Cleaner code with just 2 overloads: one for 1 string message, another for multiple (up to four)
 - Can write logs to `.md` file
 - Customize settings in ScriptableObject
 - Supports Unity 6
 - Build LogLevel now follows the last-set Editor LogLevel
-
 
 ## [0.2.2] 02-04-2025
 
@@ -26,7 +71,8 @@ The changelog format is based on [Keep a Changelog](https://keepachangelog.com/e
 ## [0.2.1]
 
 > ### Package Numbering Change
-> #### Package will now be numbered starting with 0, to better reflect the current status in development (see the official semver information [here](https://semver.org/#spec-item-4)).
+>
+> #### Package will now be numbered starting with 0, to better reflect the current status in development (see the official semver information [here](https://semver.org/#spec-item-4))
 >
 > If any issues arise when updating from previous (and higher numbered versions), please delete the old version before updating to this version.
 
@@ -109,4 +155,4 @@ The changelog format is based on [Keep a Changelog](https://keepachangelog.com/e
 
 ### Removed
 
-- 
+-

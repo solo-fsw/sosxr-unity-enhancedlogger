@@ -1,0 +1,226 @@
+// This file is generated. Do not modify by hand.
+// XML documentation file not found. To check if public methods have XML comments,
+// make sure the XML doc file is present and located next to the scraped dll
+[NUnit.Framework.TestFixture] public class AdditionalEdgeCaseTests : LogTestBase
+{
+    public AdditionalEdgeCaseTests() {}
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator AllLevels_NoneLevel_SuppressesEverything();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Debug_WithHtmlTags_Preserved();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Error_WithWhitespaceMessage_LogsWhitespace();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Info_WithNullMessage2_SkipsNull();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Log_AfterMultipleLevelChanges_WorksCorrectly();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Static_WithEmptyMessages_AllEmpty();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Static_WithNullMessage_HandledCorrectly();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Success_WithEmoji_HandledCorrectly();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Verbose_WithMixedContent_HandledCorrectly();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Warning_WithTabsAndNewlines_HandledCorrectly();
+}
+
+[NUnit.Framework.TestFixture] public class EdgeCases : LogTestBase
+{
+    public EdgeCases() {}
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Error_EmptyMessage_LogsEmpty();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Error_LongMessage_HandledCorrectly();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Error_MessageWithSpecialCharacters_HandledCorrectly();
+    [NUnit.Framework.Test] public void Error_NullMessage_DoesNotThrow();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Error_UnicodeMessage_HandledCorrectly();
+    [NUnit.Framework.Test] public void GetColor_ReturnsDefault_WhenSettingsNull();
+    [NUnit.Framework.Test] public void GetPrefix_ReturnsDefault_WhenSettingsNull();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator LogLevel_CanBeChangedAtRuntime();
+}
+
+[NUnit.Framework.TestFixture] public class FileLoggingTests
+{
+    public FileLoggingTests() {}
+    [NUnit.Framework.SetUp] public void Setup();
+    [NUnit.Framework.TearDown] public void TearDown();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator WriteToFile_Enabled_DoesNotThrow();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator WriteToFile_MultipleMessages_DoesNotThrow();
+}
+
+[NUnit.Framework.TestFixture] public class FinalCoverageTests : LogTestBase
+{
+    public FinalCoverageTests() {}
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Debug_With2Parts();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Error_WithAllMessageParts_4Parts();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Info_SinglePart();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Static_FourMessages();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Static_SingleMessage();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Static_TwoMessages();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Success_EmptyPart2_Ignored();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Verbose_AllPartsNullExceptFirst();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Warning_With3Parts_Part4Ignored();
+}
+
+[NUnit.Framework.TestFixture] public class GameObjectTests : LogTestBase
+{
+    public GameObjectTests() {}
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Log_AfterObjectDestroyed_StillWorks();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Log_MultipleObjects_DistinguishesSources();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Log_WithNullObject_DoesNotThrow();
+}
+
+[NUnit.Framework.TestFixture] public class IntegrationTests : LogTestBase
+{
+    public IntegrationTests() {}
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator BulkLogging_100Messages();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator FullWorkflow_MultipleObjectsAndLevels();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator RealisticScenario_GameLoop();
+}
+
+[NUnit.Framework.TestFixture] public class LogLevelCombinationsTests : LogTestBase
+{
+    public LogLevelCombinationsTests() {}
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Debug_SuppressesInfoSuccessVerbose();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Error_ShowsOnlyError();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Info_SuppressesSuccessAndVerbose();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Success_SuppressesVerboseOnly();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Verbose_ShowsAllLowerPriority();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Warning_SuppressesDebugInfoSuccessVerbose();
+}
+
+[NUnit.Framework.TestFixture] public class LogLevelEnumTests
+{
+    public LogLevelEnumTests() {}
+    [NUnit.Framework.Test] public void LogLevel_Count_IsSeven();
+    [NUnit.Framework.Test] public void LogLevel_HasAllExpectedValues();
+    [NUnit.Framework.Test] public void LogLevel_Values_AreInCorrectOrder();
+}
+
+public abstract class LogTestBase
+{
+    protected System.Collections.Generic.List<LogTestBase.LogEntry> CapturedLogs { get; }
+    protected UnityEngine.GameObject MockObject { get; }
+    protected LogTestBase() {}
+    protected void AssertLogContains(string expectedText, string message = default(string));
+    protected void AssertLogCount(int expectedCount, string message = default(string));
+    protected void AssertLogDoesNotContain(string forbiddenText, string message = default(string));
+    protected void AssertLogLevelPresent(SOSXR.EnhancedLogger.LogLevel level);
+    [NUnit.Framework.SetUp] public void BaseSetup();
+    [NUnit.Framework.TearDown] public void BaseTearDown();
+    protected System.Collections.IEnumerator WaitForLogs();
+    protected class LogEntry
+    {
+        public string Message { get; set; }
+        public string StackTrace { get; set; }
+        public System.DateTime Timestamp { get; set; }
+        public UnityEngine.LogType Type { get; set; }
+        public LogEntry() {}
+    }
+}
+
+[NUnit.Framework.TestFixture] public class MessageContentTests : LogTestBase
+{
+    public MessageContentTests() {}
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Log_ContainsColorTag();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Log_ContainsMethodName();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Log_ContainsObjectName();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Log_ContainsPrefix();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator MultipleLogs_MaintainOrder();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator StaticLog_DoesNotContainObjectName();
+}
+
+[NUnit.Framework.TestFixture] public class MultipleMessageOverloads : LogTestBase
+{
+    public MultipleMessageOverloads() {}
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Debug_TwoMessages_CombinesWithSeparator();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Error_FourMessages_CombinesAll();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Error_TwoMessages_CombinesWithSeparator();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Warning_ThreeMessages_CombinesWithSeparator();
+}
+
+[NUnit.Framework.TestFixture] public class SecurityAndSafetyTests : LogTestBase
+{
+    public SecurityAndSafetyTests() {}
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Log_WithPathCharacters_Safe();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Log_WithPotentialInjection_Safe();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Log_WithVeryLongMessage_Handled();
+}
+
+[NUnit.Framework.TestFixture] public class SettingsCreationTests
+{
+    public SettingsCreationTests() {}
+    [NUnit.Framework.Test] public void Settings_AssetExists_AfterAccess();
+    [NUnit.Framework.Test] public void Settings_CanToggleFileLogging();
+    [NUnit.Framework.Test] public void Settings_DefaultValues_AreValid();
+}
+
+[NUnit.Framework.TestFixture] public class SettingsTests
+{
+    public SettingsTests() {}
+    [NUnit.Framework.Test] public void CurrentLogLevel_CanBeSetAndRetrieved();
+    [NUnit.Framework.Test] public void GetColor_ReturnsValidColorForEachLevel();
+    [NUnit.Framework.Test] public void GetPrefix_ReturnsCorrectPrefixForEachLevel();
+    [NUnit.Framework.Test] public void Settings_NotNull();
+}
+
+[NUnit.Framework.TestFixture] public class ShowHigherPriorityLogs : LogTestBase
+{
+    public ShowHigherPriorityLogs() {}
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Debug_ShowsWarningAndErrorLogs();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Info_ShowsAllHigherPriorityLogs();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Warning_ShowsErrorLogs();
+}
+
+[NUnit.Framework.TestFixture] public class ShowOwnLogs : LogTestBase
+{
+    public ShowOwnLogs() {}
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Debug_ShowsDebugLogs();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Error_ShowsErrorLogs();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Info_ShowsInfoLogs();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Success_ShowsSuccessLogs();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Verbose_ShowsVerboseLogs();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Warning_ShowsWarningLogs();
+}
+
+[NUnit.Framework.TestFixture] public class StaticLogMethods : LogTestBase
+{
+    public StaticLogMethods() {}
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Static_DefaultsToDebugLevel();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Static_Error_LogsMessage();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Static_MultipleMessages_CombinesWithSeparator();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator Static_Warning_LogsMessage();
+}
+
+[NUnit.Framework.TestFixture] public class StressTests : LogTestBase
+{
+    public StressTests() {}
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator ManyUniqueMessages_HandlesCorrectly();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator RapidLevelSwitching_HandlesCorrectly();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator RapidLogging_HandlesCorrectly();
+}
+
+[NUnit.Framework.TestFixture] public class StringCombinerTests : LogTestBase
+{
+    public StringCombinerTests() {}
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator StringCombiner_AllEmptyStrings();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator StringCombiner_AllNullExceptFirst();
+    [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator StringCombiner_MixedNullAndEmpty();
+}
+
+[NUnit.Framework.TestFixture] public class SuppressLowerPriorityLogs : LogTestBase
+{
+    public SuppressLowerPriorityLogs() {}
+    [NUnit.Framework.Test] public void Error_SuppressesWarningAndLowerLogs();
+    [NUnit.Framework.Test] public void None_SuppressesAllLogs();
+    [NUnit.Framework.Test] public void Warning_SuppressesDebugAndLowerLogs();
+}
+
+[NUnit.Framework.TestFixture] public class WriteToFileEdgeCaseTests
+{
+    public WriteToFileEdgeCaseTests() {}
+    [NUnit.Framework.Test] public void WriteToFile_DuplicateMessages_CacheStaysSmall();
+    [NUnit.Framework.Test] public void WriteToFile_Log_EmptyString_DoesNotThrow();
+    [NUnit.Framework.Test] public void WriteToFile_Log_NullMessage_DoesNotThrow();
+    [NUnit.Framework.Test] public void WriteToFile_Log_WithBackticks_EscapesCorrectly();
+    [NUnit.Framework.Test] public void WriteToFile_Log_WithNewlines_HandledCorrectly();
+    [NUnit.Framework.Test] public void WriteToFile_ManyUniqueMessages_CacheGrows();
+}
+
+[NUnit.Framework.TestFixture] public class WriteToFileTests
+{
+    public WriteToFileTests() {}
+    [NUnit.Framework.Test] public void WriteToFile_CacheSize_PropertyWorks();
+    [NUnit.Framework.Test] public void WriteToFile_Log_DoesNotThrowWithNullSettings();
+    [NUnit.Framework.Test] public void WriteToFile_MultipleLogs_DoesNotThrow();
+}

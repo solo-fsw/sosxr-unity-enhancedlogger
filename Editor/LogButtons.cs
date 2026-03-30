@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 
 
-namespace SOSXR.EnhancedLogger
+namespace SOSXR.EnhancedLogger.EditorScripts
 {
     /// <summary>
     ///     Creates buttons in the Scene view to change the log level
@@ -16,6 +16,8 @@ namespace SOSXR.EnhancedLogger
     [ExecuteAlways]
     public class LogButtons : MonoBehaviour
     {
+        // Calculate the total number of buttons needed by getting the highest enum value and adding 1.
+        // This ensures we have a button for each log level, including the "None" level.
         private static readonly int _buttonCount = (int) Enum.GetValues(typeof(LogLevel)).Cast<LogLevel>().Last() + 1; // We want to get the Max count of the enum LogLevel.
         private const string _menuPath = "SOSXR/EnhancedLogger/";
         private const float _buttonWidth = 80f;
@@ -38,7 +40,9 @@ namespace SOSXR.EnhancedLogger
             // Get the size of the Scene view
             var sceneViewSize = new Vector2(sceneView.position.width, sceneView.position.height);
 
-            // Calculate the position for the buttons in the bottom-right corner
+            // Position buttons in the bottom-right corner of the Scene view.
+            // The coordinate system has (0,0) at the top-left, so we subtract from the scene view dimensions
+            // to place buttons at the bottom-right. The rect dimensions include margins for proper spacing.
             var verticalButtonRect = new Rect(
                 sceneViewSize.x - (_buttonWidth + _margin_hor),
                 sceneViewSize.y - (_buttonHeight * _buttonCount + _margin_vert),

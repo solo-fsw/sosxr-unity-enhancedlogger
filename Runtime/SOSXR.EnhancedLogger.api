@@ -1,0 +1,67 @@
+// This file is generated. Do not modify by hand.
+// XML documentation file not found. To check if public methods have XML comments,
+// make sure the XML doc file is present and located next to the scraped dll
+namespace SOSXR.EnhancedLogger
+{
+    [UnityEngine.CreateAssetMenu(fileName = @"EnhancedLoggerSettings", menuName = @"SOSXR/EnhancedLogger/EnhancedLoggerSettings", order = 1)] public class EnhancedLoggerSettings : UnityEngine.ScriptableObject
+    {
+        [UnityEngine.Header(@"Log Level")] public LogLevel CurrentLogLevel = LogLevel.Info;
+        public UnityEngine.Color DebugColor;
+        public string DebugPrefix = @"=DEBUG=";
+        [UnityEngine.Header(@"Colors")] public UnityEngine.Color ErrorColor;
+        [UnityEngine.Header(@"Prefixes")] public string ErrorPrefix = @"[ERROR]";
+        public UnityEngine.Color InfoColor;
+        public string InfoPrefix = @"INFORM:";
+        public UnityEngine.Color SuccessColor;
+        public string SuccessPrefix = @"SUCCESS";
+        public UnityEngine.Color VerboseColor;
+        public string VerbosePrefix = @"VERBOSE";
+        public UnityEngine.Color WarningColor;
+        public string WarningPrefix = @"WARNING";
+        [UnityEngine.Header(@"File Logging")] public bool WriteToFile = true;
+        public EnhancedLoggerSettings() {}
+    }
+
+    public static class Log
+    {
+        public static EnhancedLoggerSettings EnhancedLoggerSettings;
+        public static LogLevel CurrentLogLevel { get; set; }
+        public static void Console(this UnityEngine.Object caller, string message, LogLevel logLevel = LogLevel.Debug, [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0, [System.Runtime.CompilerServices.CallerMemberName] string callerName = @"", [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = @"");
+        public static void Console(this UnityEngine.Object caller, string message, string message2, string message3 = @"", string message4 = @"", LogLevel logLevel = LogLevel.Debug, [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0, [System.Runtime.CompilerServices.CallerMemberName] string callerName = @"", [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = @"");
+        public static void Debug(this UnityEngine.Object caller, string message, [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0, [System.Runtime.CompilerServices.CallerMemberName] string callerName = @"", [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = @"");
+        public static void Debug(this UnityEngine.Object caller, string message, string message2, string message3 = @"", string message4 = @"", [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0, [System.Runtime.CompilerServices.CallerMemberName] string callerName = @"", [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = @"");
+        public static void Error(this UnityEngine.Object caller, string message, [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0, [System.Runtime.CompilerServices.CallerMemberName] string callerName = @"", [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = @"");
+        public static void Error(this UnityEngine.Object caller, string message, string message2, string message3 = @"", string message4 = @"", [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0, [System.Runtime.CompilerServices.CallerMemberName] string callerName = @"", [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = @"");
+        public static UnityEngine.Color GetColor(LogLevel logLevel);
+        public static string GetPrefix(LogLevel logLevel);
+        public static void Info(this UnityEngine.Object caller, string message, [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0, [System.Runtime.CompilerServices.CallerMemberName] string callerName = @"", [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = @"");
+        public static void Info(this UnityEngine.Object caller, string message, string message2, string message3 = @"", string message4 = @"", [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0, [System.Runtime.CompilerServices.CallerMemberName] string callerName = @"", [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = @"");
+        [UnityEngine.RuntimeInitializeOnLoadMethod] public static void ReportLogLevel();
+        public static void Static(string message, LogLevel logLevel = LogLevel.Debug, [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0, [System.Runtime.CompilerServices.CallerMemberName] string callerName = @"", [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = @"");
+        public static void Static(string message, string message2, string message3 = @"", string message4 = @"", LogLevel logLevel = LogLevel.Debug, [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0, [System.Runtime.CompilerServices.CallerMemberName] string callerName = @"", [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = @"");
+        public static void Success(this UnityEngine.Object caller, string message, [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0, [System.Runtime.CompilerServices.CallerMemberName] string callerName = @"", [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = @"");
+        public static void Success(this UnityEngine.Object caller, string message, string message2, string message3 = @"", string message4 = @"", [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0, [System.Runtime.CompilerServices.CallerMemberName] string callerName = @"", [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = @"");
+        public static void Verbose(this UnityEngine.Object caller, string message, [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0, [System.Runtime.CompilerServices.CallerMemberName] string callerName = @"", [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = @"");
+        public static void Verbose(this UnityEngine.Object caller, string message, string message2, string message3 = @"", string message4 = @"", [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0, [System.Runtime.CompilerServices.CallerMemberName] string callerName = @"", [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = @"");
+        public static void Warning(this UnityEngine.Object caller, string message, [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0, [System.Runtime.CompilerServices.CallerMemberName] string callerName = @"", [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = @"");
+        public static void Warning(this UnityEngine.Object caller, string message, string message2, string message3 = @"", string message4 = @"", [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0, [System.Runtime.CompilerServices.CallerMemberName] string callerName = @"", [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = @"");
+    }
+
+    public enum LogLevel
+    {
+        None = 0,
+        Error = 1,
+        Warning = 2,
+        Debug = 3,
+        Info = 4,
+        Success = 5,
+        Verbose = 6,
+    }
+
+    public static class WriteToFile
+    {
+        public static int CacheSize { get; }
+        public static void Log(string message);
+        public static void WriteFile();
+    }
+}

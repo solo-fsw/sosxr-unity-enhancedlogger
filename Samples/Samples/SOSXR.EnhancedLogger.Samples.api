@@ -1,0 +1,35 @@
+// This file is generated. Do not modify by hand.
+// XML documentation file not found. To check if public methods have XML comments,
+// make sure the XML doc file is present and located next to the scraped dll
+public class DemoEnhancedLogger : UnityEngine.MonoBehaviour
+{
+    [UnityEngine.Header(@"You can call logs unto other objects")] public UnityEngine.GameObject otherGameObject;
+    public DemoEnhancedLogger() {}
+}
+
+public class DemoEnhancedLoggerFour : UnityEngine.MonoBehaviour
+{
+    public DemoEnhancedLoggerFour() {}
+    [UnityEngine.ContextMenu(@"MakeDebugLog")] public void MakeDebugLog();
+    [UnityEngine.ContextMenu(@"MakeErrorLog")] public void MakeErrorLog();
+    [UnityEngine.ContextMenu(@"MakeInfoLog")] public void MakeInfoLog();
+    [UnityEngine.ContextMenu(@"MakeSuccessLog")] public void MakeSuccessLog();
+    [UnityEngine.ContextMenu(@"MakeVerboseLog")] public void MakeVerboseLog();
+    [UnityEngine.ContextMenu(@"MakeWarningLog")] public void MakeWarningLog();
+}
+
+public class DemoEnhancedLoggerThree : UnityEngine.MonoBehaviour
+{
+    public DemoEnhancedLoggerThree() {}
+    [UnityEngine.ContextMenu(@"MakeDebugLog")] public void MakeDebugLog();
+    [UnityEngine.ContextMenu(@"MakeErrorLog")] public void MakeErrorLog();
+    [UnityEngine.ContextMenu(@"MakeInfoLog")] public void MakeInfoLog();
+    [UnityEngine.ContextMenu(@"MakeSuccessLog")] public void MakeSuccessLog();
+    [UnityEngine.ContextMenu(@"MakeVerboseLog")] public void MakeVerboseLog();
+    [UnityEngine.ContextMenu(@"MakeWarningLog")] public void MakeWarningLog();
+}
+
+public class DemoEnhancedLoggerTwo : UnityEngine.MonoBehaviour
+{
+    public DemoEnhancedLoggerTwo() {}
+}
