@@ -52,13 +52,12 @@ namespace SOSXR.EnhancedLogger
 
         private static void LoadSettingsAsset()
         {
-#if UNITY_EDITOR
-
             if (EnhancedLoggerSettings)
             {
                 return;
             }
 
+            // Try to load from Resources folder first
             EnhancedLoggerSettings = Resources.Load<EnhancedLoggerSettings>(
                 nameof(EnhancedLoggerSettings)
             );
@@ -68,6 +67,7 @@ namespace SOSXR.EnhancedLogger
             // The asset is created in Assets/_SOSXR/Resources/ so it can be loaded at runtime via Resources.Load().
             if (!EnhancedLoggerSettings)
             {
+#if UNITY_EDITOR
                 var settingsFolder = "Assets/_SOSXR/Resources";
                 var assetPath = $"{settingsFolder}/{nameof(EnhancedLoggerSettings)}.asset";
 
@@ -80,13 +80,17 @@ namespace SOSXR.EnhancedLogger
                 // Create the settings asset if it doesn't exist, in the settingsPath
                 EnhancedLoggerSettings = ScriptableObject.CreateInstance<EnhancedLoggerSettings>();
                 AssetDatabase.CreateAsset(EnhancedLoggerSettings, assetPath);
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
 
                 UnityEngine.Debug.LogWarningFormat(
                     $"No Settings asset found, creating a new one in the Resources folder at {assetPath}."
                 );
-            }
-
+#else
+                // In runtime/test mode, create a temporary instance if no asset exists
+                EnhancedLoggerSettings = ScriptableObject.CreateInstance<EnhancedLoggerSettings>();
 #endif
+            }
         }
 
         /// <summary>
@@ -250,7 +254,10 @@ namespace SOSXR.EnhancedLogger
             return false; // Logs are not shown in the Release build
 #endif
 
-            return CurrentLogLevel >= logLevel; // Only show logs that are equal to or above the current log level
+            // Show logs that are equal to or lower numeric value (higher priority) than the current log level
+            // Example: If CurrentLogLevel = Info (4), show Error (1), Warning (2), Debug (3), Info (4), but NOT Success (5) or Verbose (6)
+            // Fixed: was >=, should be <=
+            return logLevel <= CurrentLogLevel;
         }
 
         /// <summary>
