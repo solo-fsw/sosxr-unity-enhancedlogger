@@ -118,6 +118,7 @@ namespace SOSXR.EnhancedLogger.EditorScripts
         }
 
         [MenuItem("SOSXR/Folders/" + nameof(EnhancedLogger), false, 100)]
+        [MenuItem(_menuPath + "Stored Logs Folder", false, 100)]
         private static void EnhancedLogger()
         {
             var fullPath = Path.Combine(Application.persistentDataPath, "EnhancedLogger");
@@ -197,4 +198,3 @@ namespace SOSXR.EnhancedLogger.EditorScripts
         }
     }
 }
-
