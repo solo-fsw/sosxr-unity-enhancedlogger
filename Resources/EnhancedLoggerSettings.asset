@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: EnhancedLoggerSettings
   m_EditorClassIdentifier: 
   CurrentLogLevel: 6
-  ErrorPrefix: '[ERROR]'
+  ErrorPrefix: 'ERROR  '
   WarningPrefix: WARNING
-  DebugPrefix: DEBUG
-  InfoPrefix: INFORM
+  DebugPrefix: 'DEBUG  '
+  InfoPrefix: 'INFORM '
   SuccessPrefix: SUCCESS
   VerbosePrefix: VERBOSE
   ErrorColor: {r: 0.8627452, g: 0.1921569, b: 0.1960784, a: 1}

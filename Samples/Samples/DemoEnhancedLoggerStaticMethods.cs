@@ -17,28 +17,33 @@ public class DemoEnhancedLoggerStaticMethods : MonoBehaviour
         Log.Static("Some verbose log, directly from the static Log class", LogLevel.Verbose);
     }
 
-    [ContextMenu(nameof(MakeDebugLog))]
-    public void MakeDebugLog()
+    [ContextMenu(nameof(MakeDefaultLog))]
+    public void MakeDefaultLog()
     {
-        Log.Static("Some debug log, directly from the static Log class");
+        Log.Static(
+            "Some debug log, directly from the static Log class. Note that if you don't set the LogLevel in a static log call, it defaults to Debug."
+        );
     }
 
-    [ContextMenu(nameof(MakeInfoLog))]
-    public void MakeInfoLog()
+    [ContextMenu(nameof(MakeInfoLogWithGameObject))]
+    public void MakeInfoLogWithGameObject()
     {
-        Log.Static("Some info log, directly from the static Log class", LogLevel.Info);
+        Log.Static(
+            $"Note that you won't get the GameObject that the class is attached to, unless you pass that manually, like here, where we note it is called by {this.gameObject.name}",
+            LogLevel.Info
+        );
     }
 
     [ContextMenu(nameof(MakeSuccessLog))]
     public void MakeSuccessLog()
     {
-        Log.Static("Some success log, directly from the static Log class", LogLevel.Success);
+        Log.Static($"{nameof(LogLevel.Success)}!", LogLevel.Success);
     }
 
     [ContextMenu(nameof(MakeWarningLog))]
     public void MakeWarningLog()
     {
-        Log.Static("Some warning log, directly from the static Log class", LogLevel.Warning);
+        Log.Static("This is a warning.", LogLevel.Warning);
     }
 
     [ContextMenu(nameof(MakeErrorLog))]

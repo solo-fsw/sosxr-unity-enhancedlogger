@@ -19,18 +19,18 @@ namespace SOSXR.EnhancedLogger
         [Header("Log Level")]
         public LogLevel CurrentLogLevel = LogLevel.Info;
 
-        /// <summary>Prefix prepended to Error-level log messages (default: <c>[ERROR]</c>).</summary>
+        /// <summary>Prefix prepended to Error-level log messages (default: <c>ERROR  </c>).</summary>
         [Header("Prefixes")]
-        public string ErrorPrefix = "[ERROR]";
+        public string ErrorPrefix = "ERROR  ";
 
         /// <summary>Prefix prepended to Warning-level log messages (default: <c>WARNING</c>).</summary>
         public string WarningPrefix = "WARNING";
 
-        /// <summary>Prefix prepended to Debug-level log messages (default: <c>DEBUG</c>).</summary>
-        public string DebugPrefix = "DEBUG";
+        /// <summary>Prefix prepended to Debug-level log messages (default: <c>DEBUG  </c>).</summary>
+        public string DebugPrefix = "DEBUG  ";
 
-        /// <summary>Prefix prepended to Info-level log messages (default: <c>INFORM</c>).</summary>
-        public string InfoPrefix = "INFORM";
+        /// <summary>Prefix prepended to Info-level log messages (default: <c>INFORM </c>).</summary>
+        public string InfoPrefix = "INFORM ";
 
         /// <summary>Prefix prepended to Success-level log messages (default: <c>SUCCESS</c>).</summary>
         public string SuccessPrefix = "SUCCESS";

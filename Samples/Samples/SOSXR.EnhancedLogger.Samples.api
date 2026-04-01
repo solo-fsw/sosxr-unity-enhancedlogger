@@ -21,9 +21,9 @@ public class DemoEnhancedLoggerInstanceMethods : UnityEngine.MonoBehaviour
 public class DemoEnhancedLoggerStaticMethods : UnityEngine.MonoBehaviour
 {
     public DemoEnhancedLoggerStaticMethods() {}
-    [UnityEngine.ContextMenu(@"MakeDebugLog")] public void MakeDebugLog();
+    [UnityEngine.ContextMenu(@"MakeDefaultLog")] public void MakeDefaultLog();
     [UnityEngine.ContextMenu(@"MakeErrorLog")] public void MakeErrorLog();
-    [UnityEngine.ContextMenu(@"MakeInfoLog")] public void MakeInfoLog();
+    [UnityEngine.ContextMenu(@"MakeInfoLogWithGameObject")] public void MakeInfoLogWithGameObject();
     [UnityEngine.ContextMenu(@"MakeSuccessLog")] public void MakeSuccessLog();
     [UnityEngine.ContextMenu(@"MakeVerboseLog")] public void MakeVerboseLog();
     [UnityEngine.ContextMenu(@"MakeWarningLog")] public void MakeWarningLog();

@@ -23,30 +23,31 @@ public class DemoEnhancedLogger : MonoBehaviour
     {
         if (m_destroyThisGameObject)
         {
-            Log.Static(
-                "I TOLD YOU NOT TO DO THIS :), You're gonna get a NullReferenceException now."
-            );
+            Log.Static("I TOLD YOU NOT TO DO THIS :)");
             DestroyImmediate(gameObject);
         }
 
         this.Warning(
-            $"This is a warning message, it is shown when the log level is set to Warning, Info, Debug, Success, or Verbose. The current log level i {Log.CurrentLogLevel.ToString()}"
+            $"This is a warning message, it is shown when the log level is set to Warning, Info, Debug, Success, or Verbose. The current log level is {Log.CurrentLogLevel.ToString()}"
         );
 
         this.Success(
-            $"This is a success message. We can do string interpolation. This message is shown when the log level is set to {Log.CurrentLogLevel.ToString()} or {nameof(LogLevel.Verbose)}, but not when it's set to {nameof(LogLevel.None)}, {nameof(LogLevel.Error)}, or {nameof(LogLevel.Warning)}."
+            $"This is a success message. This message is shown when the log level is set to {nameof(LogLevel.Success)}, but not when it's set to {nameof(LogLevel.None)}, {nameof(LogLevel.Error)}, {nameof(LogLevel.Warning)}, {nameof(LogLevel.Debug)} or {nameof(LogLevel.Info)}"
         );
 
         Camera.main.Verbose(
-            "This is a message on another object. Usually you'd use the EnhancedLogger on the current object (by using it as an extension method: this.Verbose(...)). However, you can run it on another object as well. In this example it runs on the main camera by using the extension method on that object: Camera.main.Verbose(...)."
+            "This is a message on another object. Usually you'd use the EnhancedLogger on the current object (by using it as an extension method to the current object: this.Verbose(...)). However, you can run it on another object as well. In this example it runs on the main camera by using the extension method on that object: Camera.main.Verbose(...)."
         );
-        if (OtherGameObject != null)
+
+        if (OtherGameObject == null)
         {
-            OtherGameObject.Verbose("... yet we're still able to show a log on it!");
+            this.Error("The 'OtherGameObject' has not been set!");
         }
         else
         {
-            this.Error("The 'OtherGameObject' has not been set!");
+            OtherGameObject.Verbose(
+                "... yet we're still able to show a log on it, as long as it's set in the Inspector!"
+            );
         }
 
         this.Verbose(
