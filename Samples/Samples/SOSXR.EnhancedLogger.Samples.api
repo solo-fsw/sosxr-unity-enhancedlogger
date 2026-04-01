@@ -3,13 +3,13 @@
 // make sure the XML doc file is present and located next to the scraped dll
 public class DemoEnhancedLogger : UnityEngine.MonoBehaviour
 {
-    [UnityEngine.Header(@"You can call logs unto other objects")] public UnityEngine.GameObject otherGameObject;
+    [UnityEngine.Header(@"You can call logs unto other objects")] public UnityEngine.GameObject OtherGameObject;
     public DemoEnhancedLogger() {}
 }
 
-public class DemoEnhancedLoggerFour : UnityEngine.MonoBehaviour
+public class DemoEnhancedLoggerInstanceMethods : UnityEngine.MonoBehaviour
 {
-    public DemoEnhancedLoggerFour() {}
+    public DemoEnhancedLoggerInstanceMethods() {}
     [UnityEngine.ContextMenu(@"MakeDebugLog")] public void MakeDebugLog();
     [UnityEngine.ContextMenu(@"MakeErrorLog")] public void MakeErrorLog();
     [UnityEngine.ContextMenu(@"MakeInfoLog")] public void MakeInfoLog();
@@ -18,9 +18,9 @@ public class DemoEnhancedLoggerFour : UnityEngine.MonoBehaviour
     [UnityEngine.ContextMenu(@"MakeWarningLog")] public void MakeWarningLog();
 }
 
-public class DemoEnhancedLoggerThree : UnityEngine.MonoBehaviour
+public class DemoEnhancedLoggerStaticMethods : UnityEngine.MonoBehaviour
 {
-    public DemoEnhancedLoggerThree() {}
+    public DemoEnhancedLoggerStaticMethods() {}
     [UnityEngine.ContextMenu(@"MakeDebugLog")] public void MakeDebugLog();
     [UnityEngine.ContextMenu(@"MakeErrorLog")] public void MakeErrorLog();
     [UnityEngine.ContextMenu(@"MakeInfoLog")] public void MakeInfoLog();

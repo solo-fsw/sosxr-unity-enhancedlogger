@@ -30,6 +30,7 @@ public class DemoEnhancedLoggerTwo : MonoBehaviour
         Log.Static(
             "This is a debug message. It is shown when the log level is set to Debug, Info, Success, or Verbose. But not when it's set to None, Error, or Warning."
         );
+
         Log.Static(
             "This is a success message. It is shown when the log level is set to Success, or Info. But not when it's set to None, Error, or Warning.",
             LogLevel.Success
@@ -41,4 +42,3 @@ public class DemoEnhancedLoggerTwo : MonoBehaviour
         );
     }
 }
-
