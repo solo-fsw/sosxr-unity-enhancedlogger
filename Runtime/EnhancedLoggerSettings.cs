@@ -1,5 +1,4 @@
-using UnityEngine;
-
+﻿using UnityEngine;
 
 namespace SOSXR.EnhancedLogger
 {
@@ -9,14 +8,20 @@ namespace SOSXR.EnhancedLogger
     ///     Create or locate this asset via <c>SOSXR &gt; EnhancedLogger &gt; EnhancedLoggerSettings</c>, or let it be
     ///     generated automatically in <c>Assets/_SOSXR/Resources/</c> on first use.
     /// </summary>
-    [CreateAssetMenu(fileName = "EnhancedLoggerSettings", menuName = "SOSXR/EnhancedLogger/EnhancedLoggerSettings", order = 1)]
+    [CreateAssetMenu(
+        fileName = "EnhancedLoggerSettings",
+        menuName = "SOSXR/EnhancedLogger/EnhancedLoggerSettings",
+        order = 1
+    )]
     public class EnhancedLoggerSettings : ScriptableObject
     {
         /// <summary>The minimum log level required for a message to appear in the console. Messages below this level are suppressed.</summary>
-        [Header("Log Level")] public LogLevel CurrentLogLevel = LogLevel.Info;
+        [Header("Log Level")]
+        public LogLevel CurrentLogLevel = LogLevel.Info;
 
         /// <summary>Prefix prepended to Error-level log messages (default: <c>[ERROR]</c>).</summary>
-        [Header("Prefixes")] public string ErrorPrefix = "[ERROR]";
+        [Header("Prefixes")]
+        public string ErrorPrefix = "[ERROR]";
 
         /// <summary>Prefix prepended to Warning-level log messages (default: <c>WARNING</c>).</summary>
         public string WarningPrefix = "WARNING";
@@ -34,7 +39,8 @@ namespace SOSXR.EnhancedLogger
         public string VerbosePrefix = "VERBOSE";
 
         /// <summary>Console color applied to Error-level log prefixes (default: soft red).</summary>
-        [Header("Colors")] public Color ErrorColor = Color.softRed;
+        [Header("Colors")]
+        public Color ErrorColor = Color.softRed;
 
         /// <summary>Console color applied to Warning-level log prefixes (default: orange).</summary>
         public Color WarningColor = Color.orange;
@@ -52,7 +58,7 @@ namespace SOSXR.EnhancedLogger
         public Color VerboseColor = Color.hotPink;
 
         /// <summary>When <c>true</c>, log messages are also written to a Markdown file in <c>Application.persistentDataPath/EnhancedLogger/</c> on application quit.</summary>
-        [Header("File Logging")] public bool WriteToFile = true;
-
+        [Header("File Logging")]
+        public bool WriteToFile = true;
     }
 }

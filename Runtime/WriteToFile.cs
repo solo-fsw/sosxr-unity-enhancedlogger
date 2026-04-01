@@ -1,8 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-
 
 namespace SOSXR.EnhancedLogger
 {
@@ -18,18 +17,17 @@ namespace SOSXR.EnhancedLogger
         private static string _folderName => "EnhancedLogger";
         private static string _filePath;
         private static readonly Dictionary<string, LogEntry> _logCache = new();
-        
+
         /// <summary>
         ///     Maximum number of unique log entries to cache in memory.
         ///     When exceeded, older entries are flushed to disk early to prevent memory issues.
         /// </summary>
         private const int MaxCacheSize = 10000;
-        
+
         /// <summary>
         ///     Current cache size for monitoring purposes.
         /// </summary>
         public static int CacheSize => _logCache.Count;
-
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Init()
@@ -43,9 +41,8 @@ namespace SOSXR.EnhancedLogger
             Directory.CreateDirectory(folder);
 
             _filePath = Path.Combine(folder, $"{Application.productName}_{timestamp}.md");
-            Application.quitting += WriteFile;
+            Application.quitting += WriteFinalFile;
         }
-
 
         /// <summary>
         ///     Queues a log message for deduplication and eventual file output.
@@ -78,11 +75,10 @@ namespace SOSXR.EnhancedLogger
                 {
                     Count = 1,
                     FirstTime = now,
-                    LastTime = now
+                    LastTime = now,
                 };
             }
         }
-
 
         /// <summary>
         ///     Flushes all cached log entries to the Markdown file at <see cref="_filePath"/>.
@@ -95,7 +91,9 @@ namespace SOSXR.EnhancedLogger
             {
                 using var writer = new StreamWriter(_filePath, true);
 
-                var title = $"{Application.productName} - {Application.version} - Unity {Application.unityVersion} - {(Application.isEditor ? "Editor" : "Build")}";
+                var title =
+                    $"{Application.productName} - {Application.version} - Unity {Application.unityVersion} - {(Application.isEditor ? "Editor" : "Build")}";
+
                 writer.WriteLine($"# Log Summary of {title}\n");
 
                 foreach (var kvp in _logCache)
@@ -103,7 +101,9 @@ namespace SOSXR.EnhancedLogger
                     var msg = kvp.Key;
                     var entry = kvp.Value;
 
-                    writer.WriteLine($"{EscapeMarkdown(msg)} - from `{entry.FirstTime:HH:mm:ss}` to `{entry.LastTime:HH:mm:ss}` shown **{entry.Count}x**");
+                    writer.WriteLine(
+                        $"{EscapeMarkdown(msg)} - from `{entry.FirstTime:HH:mm:ss}` to `{entry.LastTime:HH:mm:ss}` shown **{entry.Count}x**"
+                    );
                 }
 
                 _logCache.Clear();
@@ -114,6 +114,11 @@ namespace SOSXR.EnhancedLogger
             }
         }
 
+        public static void WriteFinalFile()
+        {
+            WriteFile();
+            Application.quitting -= WriteFinalFile;
+        }
 
         private static string EscapeMarkdown(string msg)
         {
@@ -125,10 +130,9 @@ namespace SOSXR.EnhancedLogger
             msg = msg.Replace("`", "\\`");
             msg = msg.Replace("\n", " ");
             msg = msg.Replace("\r", "");
-            
+
             return $"`{msg}`";
         }
-
 
         /// <summary>
         ///     Represents a cached log entry with deduplication information.

@@ -1,9 +1,8 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-
 
 namespace SOSXR.EnhancedLogger.EditorScripts
 {
@@ -18,20 +17,19 @@ namespace SOSXR.EnhancedLogger.EditorScripts
     {
         // Calculate the total number of buttons needed by getting the highest enum value and adding 1.
         // This ensures we have a button for each log level, including the "None" level.
-        private static readonly int _buttonCount = (int) Enum.GetValues(typeof(LogLevel)).Cast<LogLevel>().Last() + 1; // We want to get the Max count of the enum LogLevel.
+        private static readonly int _buttonCount =
+            (int)Enum.GetValues(typeof(LogLevel)).Cast<LogLevel>().Last() + 1; // We want to get the Max count of the enum LogLevel.
         private const string _menuPath = "SOSXR/EnhancedLogger/";
         private const float _buttonWidth = 80f;
         private const float _buttonHeight = 20f;
         private const float _margin_hor = 25;
         private const float _margin_vert = 50;
 
-
         [InitializeOnLoadMethod]
         private static void Initialize()
         {
             SceneView.duringSceneGui += OnSceneGUI;
         }
-
 
         private static void OnSceneGUI(SceneView sceneView)
         {
@@ -96,7 +94,6 @@ namespace SOSXR.EnhancedLogger.EditorScripts
             Handles.EndGUI();
         }
 
-
         private static bool CreateButton(string text)
         {
             var isSelected = Log.CurrentLogLevel.ToString() == text;
@@ -106,7 +103,11 @@ namespace SOSXR.EnhancedLogger.EditorScripts
                 GUI.backgroundColor = Color.green; // Highlight the selected button with a different color
             }
 
-            var result = GUILayout.Button(text, GUILayout.Width(_buttonWidth), GUILayout.Height(_buttonHeight));
+            var result = GUILayout.Button(
+                text,
+                GUILayout.Width(_buttonWidth),
+                GUILayout.Height(_buttonHeight)
+            );
 
             if (isSelected)
             {
@@ -115,7 +116,6 @@ namespace SOSXR.EnhancedLogger.EditorScripts
 
             return result;
         }
-
 
         [MenuItem("SOSXR/Folders/" + nameof(EnhancedLogger), false, 100)]
         private static void EnhancedLogger()
@@ -132,7 +132,6 @@ namespace SOSXR.EnhancedLogger.EditorScripts
             }
         }
 
-
         /// <summary>
         ///     Chose if you want NO logs shown.
         /// </summary>
@@ -141,7 +140,6 @@ namespace SOSXR.EnhancedLogger.EditorScripts
         {
             Log.CurrentLogLevel = LogLevel.None;
         }
-
 
         /// <summary>
         ///     Chose if you only want Error logs shown.
@@ -152,7 +150,6 @@ namespace SOSXR.EnhancedLogger.EditorScripts
             Log.CurrentLogLevel = LogLevel.Error;
         }
 
-
         /// <summary>
         ///     Choose if you want both Warning and Error logs shown.
         /// </summary>
@@ -161,7 +158,6 @@ namespace SOSXR.EnhancedLogger.EditorScripts
         {
             Log.CurrentLogLevel = LogLevel.Warning;
         }
-
 
         /// <summary>
         ///     Choose if you want Debug, Warning, and Error logs shown.
@@ -173,7 +169,6 @@ namespace SOSXR.EnhancedLogger.EditorScripts
             Log.CurrentLogLevel = LogLevel.Debug;
         }
 
-
         /// <summary>
         ///     Choose if you want Info, Debug, Warning, and Error logs shown.
         /// </summary>
@@ -183,7 +178,6 @@ namespace SOSXR.EnhancedLogger.EditorScripts
             Log.CurrentLogLevel = LogLevel.Info;
         }
 
-
         /// <summary>
         ///     Choose if you want Success, Info, Debug, Warning, and Error logs shown.
         /// </summary>
@@ -192,7 +186,6 @@ namespace SOSXR.EnhancedLogger.EditorScripts
         {
             Log.CurrentLogLevel = LogLevel.Success;
         }
-
 
         /// <summary>
         ///     Choose if you want to see ALL logs. This is Verbose, Success, Info, Debug, Warning, and Error logs.
@@ -204,3 +197,4 @@ namespace SOSXR.EnhancedLogger.EditorScripts
         }
     }
 }
+

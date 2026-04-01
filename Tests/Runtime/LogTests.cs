@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +8,6 @@ using SOSXR.EnhancedLogger;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-
 /// <summary>
 ///     Base class for logging tests providing common setup, cleanup, and helper methods.
 /// </summary>
@@ -16,7 +15,7 @@ public abstract class LogTestBase
 {
     protected GameObject MockObject { get; private set; }
     protected List<LogEntry> CapturedLogs { get; private set; }
-    
+
     protected class LogEntry
     {
         public string Message { get; set; }
@@ -24,7 +23,6 @@ public abstract class LogTestBase
         public LogType Type { get; set; }
         public DateTime Timestamp { get; set; }
     }
-
 
     [SetUp]
     public void BaseSetup()
@@ -35,32 +33,31 @@ public abstract class LogTestBase
         Log.CurrentLogLevel = LogLevel.Info;
     }
 
-
     [TearDown]
     public void BaseTearDown()
     {
         Application.logMessageReceived -= CaptureLog;
-        
+
         if (MockObject != null)
         {
             UnityEngine.Object.DestroyImmediate(MockObject);
         }
-        
+
         CapturedLogs?.Clear();
     }
 
-
     private void CaptureLog(string logString, string stackTrace, LogType type)
     {
-        CapturedLogs.Add(new LogEntry
-        {
-            Message = logString,
-            StackTrace = stackTrace,
-            Type = type,
-            Timestamp = DateTime.Now
-        });
+        CapturedLogs.Add(
+            new LogEntry
+            {
+                Message = logString,
+                StackTrace = stackTrace,
+                Type = type,
+                Timestamp = DateTime.Now,
+            }
+        );
     }
-
 
     /// <summary>
     ///     Asserts that at least one log contains the expected text.
@@ -69,20 +66,20 @@ public abstract class LogTestBase
     {
         var found = CapturedLogs.Any(l => l.Message.Contains(expectedText));
         var actualMessages = string.Join("\n", CapturedLogs.Select(l => l.Message));
-        var fullMessage = message ?? $"Expected log containing '{expectedText}' but found:\n{actualMessages}";
+        var fullMessage =
+            message ?? $"Expected log containing '{expectedText}' but found:\n{actualMessages}";
         Assert.IsTrue(found, fullMessage);
     }
-
 
     /// <summary>
     ///     Asserts that exactly N logs were captured.
     /// </summary>
     protected void AssertLogCount(int expectedCount, string message = null)
     {
-        var fullMessage = message ?? $"Expected {expectedCount} logs but found {CapturedLogs.Count}";
+        var fullMessage =
+            message ?? $"Expected {expectedCount} logs but found {CapturedLogs.Count}";
         Assert.AreEqual(expectedCount, CapturedLogs.Count, fullMessage);
     }
-
 
     /// <summary>
     ///     Asserts that no logs contain the forbidden text.
@@ -94,7 +91,6 @@ public abstract class LogTestBase
         Assert.IsFalse(found, fullMessage);
     }
 
-
     /// <summary>
     ///     Asserts that a log was captured with the specified level's prefix and color.
     /// </summary>
@@ -104,7 +100,6 @@ public abstract class LogTestBase
         AssertLogContains(prefix, $"Expected log with {level} prefix '{prefix}'");
     }
 
-
     /// <summary>
     ///     Waits for logs to be processed.
     /// </summary>
@@ -113,7 +108,6 @@ public abstract class LogTestBase
         yield return null;
     }
 }
-
 
 /// <summary>
 ///     Tests that each log level shows its own logs.
@@ -127,12 +121,11 @@ public class ShowOwnLogs : LogTestBase
         Log.CurrentLogLevel = LogLevel.Error;
         MockObject.Error("test error");
         yield return WaitForLogs();
-        
+
         AssertLogCount(1);
         AssertLogContains("test error");
         AssertLogLevelPresent(LogLevel.Error);
     }
-
 
     [UnityTest]
     public IEnumerator Warning_ShowsWarningLogs()
@@ -140,12 +133,11 @@ public class ShowOwnLogs : LogTestBase
         Log.CurrentLogLevel = LogLevel.Warning;
         MockObject.Warning("test warning");
         yield return WaitForLogs();
-        
+
         AssertLogCount(1);
         AssertLogContains("test warning");
         AssertLogLevelPresent(LogLevel.Warning);
     }
-
 
     [UnityTest]
     public IEnumerator Debug_ShowsDebugLogs()
@@ -153,12 +145,11 @@ public class ShowOwnLogs : LogTestBase
         Log.CurrentLogLevel = LogLevel.Debug;
         MockObject.Debug("test debug");
         yield return WaitForLogs();
-        
+
         AssertLogCount(1);
         AssertLogContains("test debug");
         AssertLogLevelPresent(LogLevel.Debug);
     }
-
 
     [UnityTest]
     public IEnumerator Info_ShowsInfoLogs()
@@ -166,12 +157,11 @@ public class ShowOwnLogs : LogTestBase
         Log.CurrentLogLevel = LogLevel.Info;
         MockObject.Info("test info");
         yield return WaitForLogs();
-        
+
         AssertLogCount(1);
         AssertLogContains("test info");
         AssertLogLevelPresent(LogLevel.Info);
     }
-
 
     [UnityTest]
     public IEnumerator Success_ShowsSuccessLogs()
@@ -179,12 +169,11 @@ public class ShowOwnLogs : LogTestBase
         Log.CurrentLogLevel = LogLevel.Success;
         MockObject.Success("test success");
         yield return WaitForLogs();
-        
+
         AssertLogCount(1);
         AssertLogContains("test success");
         AssertLogLevelPresent(LogLevel.Success);
     }
-
 
     [UnityTest]
     public IEnumerator Verbose_ShowsVerboseLogs()
@@ -192,13 +181,12 @@ public class ShowOwnLogs : LogTestBase
         Log.CurrentLogLevel = LogLevel.Verbose;
         MockObject.Verbose("test verbose");
         yield return WaitForLogs();
-        
+
         AssertLogCount(1);
         AssertLogContains("test verbose");
         AssertLogLevelPresent(LogLevel.Verbose);
     }
 }
-
 
 /// <summary>
 ///     Tests that higher priority logs are shown when lower priority level is set.
@@ -212,12 +200,11 @@ public class ShowHigherPriorityLogs : LogTestBase
         Log.CurrentLogLevel = LogLevel.Warning;
         MockObject.Error("error message");
         yield return WaitForLogs();
-        
+
         AssertLogCount(1);
         AssertLogContains("error message");
         AssertLogContains(Log.GetPrefix(LogLevel.Error));
     }
-
 
     [UnityTest]
     public IEnumerator Debug_ShowsWarningAndErrorLogs()
@@ -226,14 +213,13 @@ public class ShowHigherPriorityLogs : LogTestBase
         MockObject.Error("error");
         MockObject.Warning("warning");
         yield return WaitForLogs();
-        
+
         AssertLogCount(2, "Expected 2 logs (Error + Warning)");
         AssertLogContains("error");
         AssertLogContains("warning");
         AssertLogContains(Log.GetPrefix(LogLevel.Error));
         AssertLogContains(Log.GetPrefix(LogLevel.Warning));
     }
-
 
     [UnityTest]
     public IEnumerator Info_ShowsAllHigherPriorityLogs()
@@ -243,14 +229,13 @@ public class ShowHigherPriorityLogs : LogTestBase
         MockObject.Warning("warning");
         MockObject.Debug("debug");
         yield return WaitForLogs();
-        
+
         AssertLogCount(3, "Expected 3 logs (Error + Warning + Debug)");
         AssertLogContains("error");
         AssertLogContains("warning");
         AssertLogContains("debug");
     }
 }
-
 
 /// <summary>
 ///     Tests that lower priority logs are suppressed when higher priority level is set.
@@ -267,10 +252,9 @@ public class SuppressLowerPriorityLogs : LogTestBase
         MockObject.Info("suppressed");
         MockObject.Success("suppressed");
         MockObject.Verbose("suppressed");
-        
+
         LogAssert.NoUnexpectedReceived();
     }
-
 
     [Test]
     public void Warning_SuppressesDebugAndLowerLogs()
@@ -280,10 +264,9 @@ public class SuppressLowerPriorityLogs : LogTestBase
         MockObject.Info("suppressed");
         MockObject.Success("suppressed");
         MockObject.Verbose("suppressed");
-        
+
         LogAssert.NoUnexpectedReceived();
     }
-
 
     [Test]
     public void None_SuppressesAllLogs()
@@ -295,11 +278,10 @@ public class SuppressLowerPriorityLogs : LogTestBase
         MockObject.Info("suppressed");
         MockObject.Success("suppressed");
         MockObject.Verbose("suppressed");
-        
+
         LogAssert.NoUnexpectedReceived();
     }
 }
-
 
 /// <summary>
 ///     Tests for static Log methods.
@@ -313,12 +295,11 @@ public class StaticLogMethods : LogTestBase
         Log.CurrentLogLevel = LogLevel.Error;
         Log.Static("static error", LogLevel.Error);
         yield return WaitForLogs();
-        
+
         AssertLogCount(1);
         AssertLogContains("static error");
         AssertLogLevelPresent(LogLevel.Error);
     }
-
 
     [UnityTest]
     public IEnumerator Static_Warning_LogsMessage()
@@ -326,12 +307,11 @@ public class StaticLogMethods : LogTestBase
         Log.CurrentLogLevel = LogLevel.Warning;
         Log.Static("static warning", LogLevel.Warning);
         yield return WaitForLogs();
-        
+
         AssertLogCount(1);
         AssertLogContains("static warning");
         AssertLogLevelPresent(LogLevel.Warning);
     }
-
 
     [UnityTest]
     public IEnumerator Static_DefaultsToDebugLevel()
@@ -339,12 +319,11 @@ public class StaticLogMethods : LogTestBase
         Log.CurrentLogLevel = LogLevel.Debug;
         Log.Static("static debug");
         yield return WaitForLogs();
-        
+
         AssertLogCount(1);
         AssertLogContains("static debug");
         AssertLogLevelPresent(LogLevel.Debug);
     }
-
 
     [UnityTest]
     public IEnumerator Static_MultipleMessages_CombinesWithSeparator()
@@ -352,12 +331,11 @@ public class StaticLogMethods : LogTestBase
         Log.CurrentLogLevel = LogLevel.Info;
         Log.Static("A", "B", "C", logLevel: LogLevel.Info);
         yield return WaitForLogs();
-        
+
         AssertLogCount(1);
         AssertLogContains("A : B : C");
     }
 }
-
 
 /// <summary>
 ///     Tests for multiple message overloads.
@@ -371,11 +349,10 @@ public class MultipleMessageOverloads : LogTestBase
         Log.CurrentLogLevel = LogLevel.Error;
         MockObject.Error("First", "Second");
         yield return WaitForLogs();
-        
+
         AssertLogCount(1);
         AssertLogContains("First : Second");
     }
-
 
     [UnityTest]
     public IEnumerator Error_FourMessages_CombinesAll()
@@ -383,11 +360,10 @@ public class MultipleMessageOverloads : LogTestBase
         Log.CurrentLogLevel = LogLevel.Error;
         MockObject.Error("A", "B", "C", "D");
         yield return WaitForLogs();
-        
+
         AssertLogCount(1);
         AssertLogContains("A : B : C : D");
     }
-
 
     [UnityTest]
     public IEnumerator Warning_ThreeMessages_CombinesWithSeparator()
@@ -395,11 +371,10 @@ public class MultipleMessageOverloads : LogTestBase
         Log.CurrentLogLevel = LogLevel.Warning;
         MockObject.Warning("One", "Two", "Three");
         yield return WaitForLogs();
-        
+
         AssertLogCount(1);
         AssertLogContains("One : Two : Three");
     }
-
 
     [UnityTest]
     public IEnumerator Debug_TwoMessages_CombinesWithSeparator()
@@ -407,12 +382,11 @@ public class MultipleMessageOverloads : LogTestBase
         Log.CurrentLogLevel = LogLevel.Debug;
         MockObject.Debug("Msg1", "Msg2");
         yield return WaitForLogs();
-        
+
         AssertLogCount(1);
         AssertLogContains("Msg1 : Msg2");
     }
 }
-
 
 /// <summary>
 ///     Tests for edge cases and error handling.
@@ -427,17 +401,15 @@ public class EdgeCases : LogTestBase
         Assert.DoesNotThrow(() => MockObject.Error(null));
     }
 
-
     [UnityTest]
     public IEnumerator Error_EmptyMessage_LogsEmpty()
     {
         Log.CurrentLogLevel = LogLevel.Error;
         MockObject.Error("");
         yield return WaitForLogs();
-        
+
         AssertLogCount(1, "Empty message should still produce a log");
     }
-
 
     [UnityTest]
     public IEnumerator Error_LongMessage_HandledCorrectly()
@@ -446,11 +418,10 @@ public class EdgeCases : LogTestBase
         var longMessage = new string('x', 1000);
         MockObject.Error(longMessage);
         yield return WaitForLogs();
-        
+
         AssertLogCount(1);
         AssertLogContains(longMessage.Substring(0, 100));
     }
-
 
     [UnityTest]
     public IEnumerator Error_MessageWithSpecialCharacters_HandledCorrectly()
@@ -458,12 +429,11 @@ public class EdgeCases : LogTestBase
         Log.CurrentLogLevel = LogLevel.Error;
         MockObject.Error("Special: {braces} and [brackets]");
         yield return WaitForLogs();
-        
+
         AssertLogCount(1);
         AssertLogContains("{braces}");
         AssertLogContains("[brackets]");
     }
-
 
     [UnityTest]
     public IEnumerator Error_UnicodeMessage_HandledCorrectly()
@@ -471,11 +441,10 @@ public class EdgeCases : LogTestBase
         Log.CurrentLogLevel = LogLevel.Error;
         MockObject.Error("Unicode: 你好世界 🎮 émojis");
         yield return WaitForLogs();
-        
+
         AssertLogCount(1);
         AssertLogContains("你好世界");
     }
-
 
     [UnityTest]
     public IEnumerator LogLevel_CanBeChangedAtRuntime()
@@ -484,14 +453,13 @@ public class EdgeCases : LogTestBase
         MockObject.Warning("first - suppressed");
         Log.CurrentLogLevel = LogLevel.Warning;
         MockObject.Warning("second - shown");
-        
+
         yield return WaitForLogs();
-        
+
         AssertLogCount(1, "Only second log should appear");
         AssertLogContains("second - shown");
         AssertLogDoesNotContain("first - suppressed");
     }
-
 
     [Test]
     public void GetPrefix_ReturnsDefault_WhenSettingsNull()
@@ -501,7 +469,6 @@ public class EdgeCases : LogTestBase
         Assert.IsNotEmpty(prefix);
     }
 
-
     [Test]
     public void GetColor_ReturnsDefault_WhenSettingsNull()
     {
@@ -509,7 +476,6 @@ public class EdgeCases : LogTestBase
         Assert.AreNotEqual(default(Color), color);
     }
 }
-
 
 /// <summary>
 ///     Tests for file logging functionality.
@@ -519,14 +485,12 @@ public class FileLoggingTests
 {
     private GameObject _mockObject;
 
-
     [SetUp]
     public void Setup()
     {
         _mockObject = new GameObject("TestObject");
         Log.CurrentLogLevel = LogLevel.Info;
     }
-
 
     [TearDown]
     public void TearDown()
@@ -541,7 +505,6 @@ public class FileLoggingTests
         }
     }
 
-
     [UnityTest]
     public IEnumerator WriteToFile_Enabled_DoesNotThrow()
     {
@@ -555,7 +518,6 @@ public class FileLoggingTests
         Assert.DoesNotThrow(() => _mockObject.Error("file test message"));
         yield return null;
     }
-
 
     [UnityTest]
     public IEnumerator WriteToFile_MultipleMessages_DoesNotThrow()
@@ -577,7 +539,6 @@ public class FileLoggingTests
     }
 }
 
-
 /// <summary>
 ///     Tests for settings management.
 /// </summary>
@@ -588,7 +549,7 @@ public class SettingsTests
     public void CurrentLogLevel_CanBeSetAndRetrieved()
     {
         var originalLevel = Log.CurrentLogLevel;
-        
+
         try
         {
             Log.CurrentLogLevel = LogLevel.Warning;
@@ -602,7 +563,6 @@ public class SettingsTests
         }
     }
 
-
     [Test]
     public void GetPrefix_ReturnsCorrectPrefixForEachLevel()
     {
@@ -612,7 +572,7 @@ public class SettingsTests
         var infoPrefix = Log.GetPrefix(LogLevel.Info);
         var successPrefix = Log.GetPrefix(LogLevel.Success);
         var verbosePrefix = Log.GetPrefix(LogLevel.Verbose);
-        
+
         Assert.IsNotNull(errorPrefix);
         Assert.IsNotNull(warningPrefix);
         Assert.IsNotNull(debugPrefix);
@@ -622,20 +582,18 @@ public class SettingsTests
         Assert.AreNotEqual(errorPrefix, warningPrefix);
     }
 
-
     [Test]
     public void GetColor_ReturnsValidColorForEachLevel()
     {
         var errorColor = Log.GetColor(LogLevel.Error);
         var warningColor = Log.GetColor(LogLevel.Warning);
         var debugColor = Log.GetColor(LogLevel.Debug);
-        
+
         Assert.AreNotEqual(default(Color), errorColor);
         Assert.AreNotEqual(default(Color), warningColor);
         Assert.AreNotEqual(default(Color), debugColor);
         Assert.AreNotEqual(errorColor, warningColor);
     }
-
 
     [Test]
     public void Settings_NotNull()
@@ -644,7 +602,6 @@ public class SettingsTests
         Assert.IsNotNull(settings, "Settings should be available");
     }
 }
-
 
 [TestFixture]
 public class LogLevelCombinationsTests : LogTestBase
@@ -663,7 +620,6 @@ public class LogLevelCombinationsTests : LogTestBase
         AssertLogCount(6, "Verbose level should show all 6 log levels");
     }
 
-
     [UnityTest]
     public IEnumerator Success_SuppressesVerboseOnly()
     {
@@ -678,7 +634,6 @@ public class LogLevelCombinationsTests : LogTestBase
         AssertLogCount(5, "Success level should show 5 logs (all except verbose)");
         AssertLogDoesNotContain("suppressed");
     }
-
 
     [UnityTest]
     public IEnumerator Info_SuppressesSuccessAndVerbose()
@@ -696,7 +651,6 @@ public class LogLevelCombinationsTests : LogTestBase
         AssertLogDoesNotContain("suppressed2");
     }
 
-
     [UnityTest]
     public IEnumerator Debug_SuppressesInfoSuccessVerbose()
     {
@@ -711,7 +665,6 @@ public class LogLevelCombinationsTests : LogTestBase
         AssertLogCount(3, "Debug level should show 3 logs");
     }
 
-
     [UnityTest]
     public IEnumerator Warning_SuppressesDebugInfoSuccessVerbose()
     {
@@ -725,7 +678,6 @@ public class LogLevelCombinationsTests : LogTestBase
         yield return WaitForLogs();
         AssertLogCount(2, "Warning level should show 2 logs");
     }
-
 
     [UnityTest]
     public IEnumerator Error_ShowsOnlyError()
@@ -743,7 +695,6 @@ public class LogLevelCombinationsTests : LogTestBase
     }
 }
 
-
 [TestFixture]
 public class MessageContentTests : LogTestBase
 {
@@ -757,7 +708,6 @@ public class MessageContentTests : LogTestBase
         AssertLogContains("MyTestObject");
     }
 
-
     [UnityTest]
     public IEnumerator Log_ContainsMethodName()
     {
@@ -766,7 +716,6 @@ public class MessageContentTests : LogTestBase
         yield return WaitForLogs();
         AssertLogContains("Log_ContainsMethodName");
     }
-
 
     [UnityTest]
     public IEnumerator Log_ContainsPrefix()
@@ -777,16 +726,17 @@ public class MessageContentTests : LogTestBase
         AssertLogContains(Log.GetPrefix(LogLevel.Error));
     }
 
-
     [UnityTest]
     public IEnumerator Log_ContainsColorTag()
     {
         Log.CurrentLogLevel = LogLevel.Error;
         MockObject.Error("test");
         yield return WaitForLogs();
-        Assert.IsTrue(CapturedLogs.Any(l => l.Message.Contains("<color=")), "Log should contain color tag");
+        Assert.IsTrue(
+            CapturedLogs.Any(l => l.Message.Contains("<color=")),
+            "Log should contain color tag"
+        );
     }
-
 
     [UnityTest]
     public IEnumerator StaticLog_DoesNotContainObjectName()
@@ -797,7 +747,6 @@ public class MessageContentTests : LogTestBase
         AssertLogCount(1);
         AssertLogContains("static test");
     }
-
 
     [UnityTest]
     public IEnumerator MultipleLogs_MaintainOrder()
@@ -811,10 +760,14 @@ public class MessageContentTests : LogTestBase
         var firstLog = CapturedLogs[0].Message;
         var secondLog = CapturedLogs[1].Message;
         var thirdLog = CapturedLogs[2].Message;
-        Assert.IsTrue(firstLog.Contains("first") && secondLog.Contains("second") && thirdLog.Contains("third"), "Logs should maintain order");
+        Assert.IsTrue(
+            firstLog.Contains("first")
+                && secondLog.Contains("second")
+                && thirdLog.Contains("third"),
+            "Logs should maintain order"
+        );
     }
 }
-
 
 [TestFixture]
 public class GameObjectTests : LogTestBase
@@ -828,7 +781,6 @@ public class GameObjectTests : LogTestBase
         AssertLogCount(1);
     }
 
-
     [UnityTest]
     public IEnumerator Log_AfterObjectDestroyed_StillWorks()
     {
@@ -840,7 +792,6 @@ public class GameObjectTests : LogTestBase
         AssertLogCount(1);
         AssertLogContains("before destroy");
     }
-
 
     [UnityTest]
     public IEnumerator Log_MultipleObjects_DistinguishesSources()
@@ -859,7 +810,6 @@ public class GameObjectTests : LogTestBase
     }
 }
 
-
 [TestFixture]
 public class WriteToFileTests
 {
@@ -870,13 +820,11 @@ public class WriteToFileTests
         Assert.IsTrue(size >= 0, "Cache size should be non-negative");
     }
 
-
     [Test]
     public void WriteToFile_Log_DoesNotThrowWithNullSettings()
     {
         Assert.DoesNotThrow(() => WriteToFile.Log("test message"));
     }
-
 
     [Test]
     public void WriteToFile_MultipleLogs_DoesNotThrow()
@@ -890,7 +838,6 @@ public class WriteToFileTests
         });
     }
 }
-
 
 [TestFixture]
 public class StressTests : LogTestBase
@@ -908,7 +855,6 @@ public class StressTests : LogTestBase
         AssertLogCount(logCount, $"Should have {logCount} logs");
     }
 
-
     [UnityTest]
     public IEnumerator RapidLevelSwitching_HandlesCorrectly()
     {
@@ -924,9 +870,11 @@ public class StressTests : LogTestBase
             }
         }
         yield return WaitForLogs();
-        AssertLogCount(expectedLogs, $"Should have {expectedLogs} logs (None level suppresses all)");
+        AssertLogCount(
+            expectedLogs,
+            $"Should have {expectedLogs} logs (None level suppresses all)"
+        );
     }
-
 
     [UnityTest]
     public IEnumerator ManyUniqueMessages_HandlesCorrectly()
@@ -942,7 +890,6 @@ public class StressTests : LogTestBase
     }
 }
 
-
 [TestFixture]
 public class LogLevelEnumTests
 {
@@ -957,14 +904,12 @@ public class LogLevelEnumTests
         Assert.IsTrue((int)LogLevel.Success < (int)LogLevel.Verbose);
     }
 
-
     [Test]
     public void LogLevel_Count_IsSeven()
     {
         var values = (LogLevel[])Enum.GetValues(typeof(LogLevel));
         Assert.AreEqual(7, values.Length, "Should have 7 log levels");
     }
-
 
     [Test]
     public void LogLevel_HasAllExpectedValues()
@@ -979,7 +924,6 @@ public class LogLevelEnumTests
     }
 }
 
-
 [TestFixture]
 public class AdditionalEdgeCaseTests : LogTestBase
 {
@@ -992,7 +936,6 @@ public class AdditionalEdgeCaseTests : LogTestBase
         AssertLogCount(1);
     }
 
-
     [UnityTest]
     public IEnumerator Error_WithWhitespaceMessage_LogsWhitespace()
     {
@@ -1001,7 +944,6 @@ public class AdditionalEdgeCaseTests : LogTestBase
         yield return WaitForLogs();
         AssertLogCount(1);
     }
-
 
     [UnityTest]
     public IEnumerator Warning_WithTabsAndNewlines_HandledCorrectly()
@@ -1013,7 +955,6 @@ public class AdditionalEdgeCaseTests : LogTestBase
         AssertLogContains("line1");
     }
 
-
     [UnityTest]
     public IEnumerator Debug_WithHtmlTags_Preserved()
     {
@@ -1024,7 +965,6 @@ public class AdditionalEdgeCaseTests : LogTestBase
         AssertLogContains("<b>");
     }
 
-
     [UnityTest]
     public IEnumerator Success_WithEmoji_HandledCorrectly()
     {
@@ -1033,7 +973,6 @@ public class AdditionalEdgeCaseTests : LogTestBase
         yield return WaitForLogs();
         AssertLogCount(1);
     }
-
 
     [UnityTest]
     public IEnumerator Verbose_WithMixedContent_HandledCorrectly()
@@ -1044,7 +983,6 @@ public class AdditionalEdgeCaseTests : LogTestBase
         AssertLogCount(1);
     }
 
-
     [UnityTest]
     public IEnumerator Static_WithNullMessage_HandledCorrectly()
     {
@@ -1054,7 +992,6 @@ public class AdditionalEdgeCaseTests : LogTestBase
         AssertLogCount(1);
     }
 
-
     [UnityTest]
     public IEnumerator Static_WithEmptyMessages_AllEmpty()
     {
@@ -1063,7 +1000,6 @@ public class AdditionalEdgeCaseTests : LogTestBase
         yield return WaitForLogs();
         AssertLogCount(1);
     }
-
 
     [UnityTest]
     public IEnumerator Log_AfterMultipleLevelChanges_WorksCorrectly()
@@ -1080,7 +1016,6 @@ public class AdditionalEdgeCaseTests : LogTestBase
         AssertLogCount(4);
     }
 
-
     [UnityTest]
     public IEnumerator AllLevels_NoneLevel_SuppressesEverything()
     {
@@ -1096,7 +1031,6 @@ public class AdditionalEdgeCaseTests : LogTestBase
     }
 }
 
-
 [TestFixture]
 public class IntegrationTests : LogTestBase
 {
@@ -1105,41 +1039,43 @@ public class IntegrationTests : LogTestBase
     {
         var obj1 = new GameObject("Player");
         var obj2 = new GameObject("Enemy");
-        
+
         Log.CurrentLogLevel = LogLevel.Success;
         obj1.Error("Player error");
         obj1.Warning("Player warning");
         obj2.Debug("Enemy debug");
         obj2.Info("Enemy info");
         obj1.Success("Player success");
-        
+
         yield return WaitForLogs();
-        
+
         AssertLogCount(5, "Should see Error, Warning, Debug, Info, Success (not Verbose)");
-        Assert.IsTrue(CapturedLogs.Any(l => l.Message.Contains("Player") && l.Message.Contains("ERROR")));
-        Assert.IsTrue(CapturedLogs.Any(l => l.Message.Contains("Enemy") && l.Message.Contains("INFORM")));
-        
+        Assert.IsTrue(
+            CapturedLogs.Any(l => l.Message.Contains("Player") && l.Message.Contains("ERROR"))
+        );
+        Assert.IsTrue(
+            CapturedLogs.Any(l => l.Message.Contains("Enemy") && l.Message.Contains("INFORM"))
+        );
+
         UnityEngine.Object.DestroyImmediate(obj1);
         UnityEngine.Object.DestroyImmediate(obj2);
     }
-
 
     [UnityTest]
     public IEnumerator RealisticScenario_GameLoop()
     {
         Log.CurrentLogLevel = LogLevel.Verbose;
-        
+
         MockObject.Debug("Game loop started");
         MockObject.Info("Player position updated", "x: 10", "y: 5");
         MockObject.Warning("Low health detected");
         MockObject.Error("Failed to load asset");
         MockObject.Success("Level completed");
         MockObject.Verbose("Frame rendered in 16ms");
-        
+
         yield return WaitForLogs();
         AssertLogCount(6, "All 6 log levels should appear at Verbose level");
     }
-
 
     [UnityTest]
     public IEnumerator BulkLogging_100Messages()
@@ -1154,7 +1090,6 @@ public class IntegrationTests : LogTestBase
     }
 }
 
-
 [TestFixture]
 public class FinalCoverageTests : LogTestBase
 {
@@ -1167,7 +1102,6 @@ public class FinalCoverageTests : LogTestBase
         AssertLogContains("A : B : C : D");
     }
 
-
     [UnityTest]
     public IEnumerator Warning_With3Parts_Part4Ignored()
     {
@@ -1176,7 +1110,6 @@ public class FinalCoverageTests : LogTestBase
         yield return WaitForLogs();
         AssertLogContains("A : B : C");
     }
-
 
     [UnityTest]
     public IEnumerator Debug_With2Parts()
@@ -1187,7 +1120,6 @@ public class FinalCoverageTests : LogTestBase
         AssertLogContains("First : Second");
     }
 
-
     [UnityTest]
     public IEnumerator Info_SinglePart()
     {
@@ -1196,7 +1128,6 @@ public class FinalCoverageTests : LogTestBase
         yield return WaitForLogs();
         AssertLogContains("Only");
     }
-
 
     [UnityTest]
     public IEnumerator Success_EmptyPart2_Ignored()
@@ -1207,7 +1138,6 @@ public class FinalCoverageTests : LogTestBase
         AssertLogContains("Main");
     }
 
-
     [UnityTest]
     public IEnumerator Verbose_AllPartsNullExceptFirst()
     {
@@ -1216,7 +1146,6 @@ public class FinalCoverageTests : LogTestBase
         yield return WaitForLogs();
         AssertLogContains("Valid");
     }
-
 
     [UnityTest]
     public IEnumerator Static_SingleMessage()
@@ -1227,7 +1156,6 @@ public class FinalCoverageTests : LogTestBase
         AssertLogContains("Single");
     }
 
-
     [UnityTest]
     public IEnumerator Static_TwoMessages()
     {
@@ -1236,7 +1164,6 @@ public class FinalCoverageTests : LogTestBase
         yield return WaitForLogs();
         AssertLogContains("One : Two");
     }
-
 
     [UnityTest]
     public IEnumerator Static_FourMessages()
@@ -1248,7 +1175,6 @@ public class FinalCoverageTests : LogTestBase
     }
 }
 
-
 [TestFixture]
 public class WriteToFileEdgeCaseTests
 {
@@ -1258,13 +1184,11 @@ public class WriteToFileEdgeCaseTests
         Assert.DoesNotThrow(() => WriteToFile.Log("Message with `backticks`"));
     }
 
-
     [Test]
     public void WriteToFile_Log_WithNewlines_HandledCorrectly()
     {
         Assert.DoesNotThrow(() => WriteToFile.Log("Line 1\nLine 2\nLine 3"));
     }
-
 
     [Test]
     public void WriteToFile_Log_EmptyString_DoesNotThrow()
@@ -1272,13 +1196,11 @@ public class WriteToFileEdgeCaseTests
         Assert.DoesNotThrow(() => WriteToFile.Log(""));
     }
 
-
     [Test]
     public void WriteToFile_Log_NullMessage_DoesNotThrow()
     {
         Assert.DoesNotThrow(() => WriteToFile.Log(null));
     }
-
 
     [Test]
     public void WriteToFile_ManyUniqueMessages_CacheGrows()
@@ -1288,9 +1210,11 @@ public class WriteToFileEdgeCaseTests
         {
             WriteToFile.Log($"Unique message {i}");
         }
-        Assert.IsTrue(WriteToFile.CacheSize > initialCacheSize, "Cache should grow with unique messages");
+        Assert.IsTrue(
+            WriteToFile.CacheSize > initialCacheSize,
+            "Cache should grow with unique messages"
+        );
     }
-
 
     [Test]
     public void WriteToFile_DuplicateMessages_CacheStaysSmall()
@@ -1300,10 +1224,13 @@ public class WriteToFileEdgeCaseTests
         {
             WriteToFile.Log("Same message");
         }
-        Assert.AreEqual(initialCacheSize + 1, WriteToFile.CacheSize, "Cache should have only 1 entry for duplicates");
+        Assert.AreEqual(
+            initialCacheSize + 1,
+            WriteToFile.CacheSize,
+            "Cache should have only 1 entry for duplicates"
+        );
     }
 }
-
 
 [TestFixture]
 public class StringCombinerTests : LogTestBase
@@ -1317,7 +1244,6 @@ public class StringCombinerTests : LogTestBase
         AssertLogContains("Only");
     }
 
-
     [UnityTest]
     public IEnumerator StringCombiner_MixedNullAndEmpty()
     {
@@ -1326,7 +1252,6 @@ public class StringCombinerTests : LogTestBase
         yield return WaitForLogs();
         AssertLogContains("First");
     }
-
 
     [UnityTest]
     public IEnumerator StringCombiner_AllEmptyStrings()
@@ -1338,7 +1263,6 @@ public class StringCombinerTests : LogTestBase
     }
 }
 
-
 [TestFixture]
 public class SettingsCreationTests
 {
@@ -1348,7 +1272,6 @@ public class SettingsCreationTests
         var settings = Log.EnhancedLoggerSettings;
         Assert.IsNotNull(settings, "Settings asset should exist after first access");
     }
-
 
     [Test]
     public void Settings_DefaultValues_AreValid()
@@ -1362,21 +1285,19 @@ public class SettingsCreationTests
         Assert.IsNotNull(settings.VerbosePrefix);
     }
 
-
     [Test]
     public void Settings_CanToggleFileLogging()
     {
         var settings = Log.EnhancedLoggerSettings;
         bool originalValue = settings.WriteToFile;
-        
+
         settings.WriteToFile = !originalValue;
         Assert.AreEqual(!originalValue, settings.WriteToFile);
-        
+
         settings.WriteToFile = originalValue;
         Assert.AreEqual(originalValue, settings.WriteToFile);
     }
 }
-
 
 [TestFixture]
 public class SecurityAndSafetyTests : LogTestBase
@@ -1385,11 +1306,12 @@ public class SecurityAndSafetyTests : LogTestBase
     public IEnumerator Log_WithPotentialInjection_Safe()
     {
         Log.CurrentLogLevel = LogLevel.Error;
-        MockObject.Error("Test #hashtag @mention <tag> 'quote' \"double\" **bold** __underline__ ~~strike~~ ||spoiler||");
+        MockObject.Error(
+            "Test #hashtag @mention <tag> 'quote' \"double\" **bold** __underline__ ~~strike~~ ||spoiler||"
+        );
         yield return WaitForLogs();
         AssertLogCount(1);
     }
-
 
     [UnityTest]
     public IEnumerator Log_WithVeryLongMessage_Handled()
@@ -1400,7 +1322,6 @@ public class SecurityAndSafetyTests : LogTestBase
         yield return WaitForLogs();
         AssertLogCount(1);
     }
-
 
     [UnityTest]
     public IEnumerator Log_WithPathCharacters_Safe()

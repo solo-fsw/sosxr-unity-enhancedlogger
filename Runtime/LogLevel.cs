@@ -1,4 +1,4 @@
-namespace SOSXR.EnhancedLogger
+﻿namespace SOSXR.EnhancedLogger
 {
     /// <summary>
     ///     Defines the severity tiers used by <see cref="Log"/> to filter console output.
@@ -26,6 +26,6 @@ namespace SOSXR.EnhancedLogger
         Success,
 
         /// <summary>Highly detailed trace-level messages. Shows all log levels. Use sparingly to avoid console noise.</summary>
-        Verbose
+        Verbose,
     }
 }
