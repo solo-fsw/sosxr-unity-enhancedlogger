@@ -26,11 +26,11 @@ namespace SOSXR.EnhancedLogger
         /// <summary>Prefix prepended to Warning-level log messages (default: <c>WARNING</c>).</summary>
         public string WarningPrefix = "WARNING";
 
-        /// <summary>Prefix prepended to Debug-level log messages (default: <c>=DEBUG=</c>).</summary>
-        public string DebugPrefix = "=DEBUG=";
+        /// <summary>Prefix prepended to Debug-level log messages (default: <c>DEBUG</c>).</summary>
+        public string DebugPrefix = "DEBUG";
 
-        /// <summary>Prefix prepended to Info-level log messages (default: <c>INFORM:</c>).</summary>
-        public string InfoPrefix = "INFORM:";
+        /// <summary>Prefix prepended to Info-level log messages (default: <c>INFORM</c>).</summary>
+        public string InfoPrefix = "INFORM";
 
         /// <summary>Prefix prepended to Success-level log messages (default: <c>SUCCESS</c>).</summary>
         public string SuccessPrefix = "SUCCESS";

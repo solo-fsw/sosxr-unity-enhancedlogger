@@ -41,7 +41,8 @@ namespace SOSXR.EnhancedLogger
             Directory.CreateDirectory(folder);
 
             _filePath = Path.Combine(folder, $"{Application.productName}_{timestamp}.md");
-            Application.quitting += WriteFinalFile;
+
+            Application.quitting += WriteFinalFile; // Subscribe to the quitting event
         }
 
         /// <summary>
@@ -114,10 +115,14 @@ namespace SOSXR.EnhancedLogger
             }
         }
 
+        /// <summary>
+        /// This wrapper is needed to unsubscribe from the quitting event again.
+        /// Otherwise the WriteFile will try to write multiple times in the Editor
+        /// </summary>
         public static void WriteFinalFile()
         {
             WriteFile();
-            Application.quitting -= WriteFinalFile;
+            Application.quitting -= WriteFinalFile; // Unsubscribe from the quitting event
         }
 
         private static string EscapeMarkdown(string msg)

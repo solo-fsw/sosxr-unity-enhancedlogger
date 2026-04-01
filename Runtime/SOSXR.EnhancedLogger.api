@@ -7,11 +7,11 @@ namespace SOSXR.EnhancedLogger
     {
         [UnityEngine.Header(@"Log Level")] public LogLevel CurrentLogLevel = LogLevel.Info;
         public UnityEngine.Color DebugColor;
-        public string DebugPrefix = @"=DEBUG=";
+        public string DebugPrefix = @"DEBUG";
         [UnityEngine.Header(@"Colors")] public UnityEngine.Color ErrorColor;
         [UnityEngine.Header(@"Prefixes")] public string ErrorPrefix = @"[ERROR]";
         public UnityEngine.Color InfoColor;
-        public string InfoPrefix = @"INFORM:";
+        public string InfoPrefix = @"INFORM";
         public UnityEngine.Color SuccessColor;
         public string SuccessPrefix = @"SUCCESS";
         public UnityEngine.Color VerboseColor;
