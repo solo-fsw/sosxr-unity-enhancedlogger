@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -36,7 +36,7 @@ namespace SOSXR.EnhancedLogger
             // This method is called before the first scene loads, ensuring the file path is ready
             // before any logs are written. The Application.quitting event is registered to flush
             // all cached logs to the file when the application exits.
-            var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+            var timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss");
             var folder = Path.Combine(Application.persistentDataPath, _folderName);
             Directory.CreateDirectory(folder);
 
@@ -58,7 +58,7 @@ namespace SOSXR.EnhancedLogger
                 return;
             }
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             if (_logCache.TryGetValue(message, out var entry))
             {
@@ -92,18 +92,23 @@ namespace SOSXR.EnhancedLogger
             {
                 using var writer = new StreamWriter(_filePath, true);
 
-                var title =
-                    $"{Application.productName} - {Application.version} - Unity {Application.unityVersion} - {(Application.isEditor ? "Editor" : "Build")}";
+                var title = $"{Application.productName} - {Application.version} - Unity {Application.unityVersion}";
+                var platform = Application.isEditor ? "Editor" : "Build";
 
-                writer.WriteLine($"# Log Summary of {title}\n");
+                writer.WriteLine($"# Log Summary of {title} - {platform}\n");
 
                 foreach (var kvp in _logCache)
                 {
                     var msg = kvp.Key;
                     var entry = kvp.Value;
 
+                    // Avoid boxing by formatting DateTime and int separately
+                    var firstTime = entry.FirstTime.ToString("HH:mm:ss");
+                    var lastTime = entry.LastTime.ToString("HH:mm:ss");
+                    var countStr = entry.Count.ToString();
+
                     writer.WriteLine(
-                        $"{EscapeMarkdown(msg)} - from `{entry.FirstTime:HH:mm:ss}` to `{entry.LastTime:HH:mm:ss}` shown **{entry.Count}x**"
+                        $"{EscapeMarkdown(msg)} - from `{firstTime}` to `{lastTime}` shown **{countStr}x**"
                     );
                 }
 

@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
@@ -103,8 +103,7 @@ namespace SOSXR.EnhancedLogger
         /// <returns>The message wrapped in Unity color tags with the hex color code.</returns>
         private static string Color(this string message, Color color)
         {
-            Color32 c = color;
-            var hex = $"#{c.r:X2}{c.g:X2}{c.b:X2}";
+            var hex = "#" + ColorUtility.ToHtmlStringRGB(color);
 
             return $"<color={hex}>{message}</color>";
         }
@@ -213,19 +212,12 @@ namespace SOSXR.EnhancedLogger
 
             // Build the location string: extract only the filename (without path) and combine with method name and line number.
             // This provides a concise reference to where the log was called from.
+            // Pre-format line number to avoid boxing in string interpolation
+            var lineNumberStr = callerLineNumber.ToString();
             var location =
-                $"{Path.GetFileNameWithoutExtension(callerFilePath)} ({callerName} : {callerLineNumber})";
+                $"{Path.GetFileNameWithoutExtension(callerFilePath)} ({callerName} : {lineNumberStr})";
 
-            var postFix = string.Empty;
-
-            // If a caller object is provided, append it to the message prefix for easy identification
-            // of which GameObject or component generated the log.
-            if (callerObject)
-            {
-                postFix = " on " + callerObject.name;
-            }
-
-            var messageStart = $"{GetPrefix(logLevel)} | {location}{postFix}";
+            var messageStart = $"{GetPrefix(logLevel)} | {location}";
 
             // Escape curly braces in the message to prevent them from being interpreted as format specifiers
             // by Unity's LogFormat method, which uses string formatting internally.
