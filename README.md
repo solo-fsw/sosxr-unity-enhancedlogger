@@ -1,7 +1,5 @@
 # EnhancedLogger
 
-**Version: 1.0.0**
-
 - By: Maarten R. Struijk Wilbrink
 - For: Leiden University SOSXR
 - Fully open source: Feel free to add to, or modify, anything you see fit.
@@ -31,8 +29,8 @@ A utility class for logging messages with customisable log levels and colours in
 
 ## Introduction
 
-This Unity package provides a flexible and customizable logging utility named `Log`. It allows you to log messages with
-different log levels (Error, Warning, Debug, Info, Success, and Verbose) and customize the appearance of log messages with colors.
+This Unity package provides a flexible and customizable logging utility named `Log`. It allows you to log messages with different log levels (Error, Warning, Debug, Info, Success, and Verbose) and customize the appearance of log messages with colors.
+
 The utility is designed to be easy to integrate into your Unity projects.
 
 ## Features
@@ -56,8 +54,7 @@ The utility is designed to be easy to integrate into your Unity projects.
 2. Open the Unity Package Manager from the `Window` menu.
 3. Click the `+` button in the top-left corner of the Package Manager window.
 4. Select `Add package from git URL…`.
-5. Enter the following Git URL in the input field: `https://github.com/mrstruijk/EnhancedLogger.git` (making sure of the
-   `.git` at the end).
+5. Enter the following Git URL in the input field: `https://github.com/mrstruijk/EnhancedLogger.git` (making sure of the `.git` at the end).
 6. Click the `Add` button.
 
 ### Manual Installation
@@ -80,16 +77,11 @@ Does not have any direct dependencies, but does work well with the [In-Game Debu
 - **Success** - Successful operations or state changes
 - **Verbose** - Detailed information for debugging application flow
 
-Each LogLevel shows the logs of the selected LogLevel and all logs with a higher LogLevel. For example, if you select
-`Warning`, you will see both `Warning` and `Error` logs. Selecting `Verbose` will show all logs. The default LogLevel
-is `Info` (also showing `Debug`, `Warning`, and `Error` logs).
+Each LogLevel shows the logs of the selected LogLevel and all logs with a higher LogLevel. For example, if you select `Warning`, you will see both `Warning` and `Error` logs. Selecting `Verbose` will show all logs. The default LogLevel is `Info` (also showing `Debug`, `Warning`, and `Error` logs).
 
 ### Opinionated Usage
 
-`Debug` is used only for when you're working on a specific module. Put in as many logs as you want, to see how the thing
-you're building is progressing. Then, when things 'settle down' and it starts working as intended: either move the
-`Debug` logs to the appropriate higher or lower level, or delete them. By the end of each day / sprint / module, `Debug` should be
-empty again.
+`Debug` is used only for when you're working on a specific module. Put in as many logs as you want, to see how the thing you're building is progressing. Then, when things 'settle down' and it starts working as intended: either move the `Debug` logs to the appropriate higher or lower level, or delete them. By the end of each day / sprint / module, `Debug` should be empty again.
 
 #### `Info` and `Success`
 
@@ -193,6 +185,14 @@ Log files are written in Markdown format for easy reading and parsing. Each line
 Message text - from `HH:mm:ss` to `HH:mm:ss` shown **Nx**
 ```
 
+### Lifecycle
+
+File logging hooks into Unity's `Application.quitting` event via a delegate:
+
+- Subscription happens automatically before the first scene loads (`[RuntimeInitializeOnLoadMethod]`)
+- On quit, `WriteFinalFile` flushes the cache and unsubscribes the delegate to prevent duplicate writes in the Editor
+- You can also call `WriteToFile.WriteFile()` manually for an early flush
+
 ## Colors
 
 Each log level has a customizable color that appears in the console prefix.
@@ -241,7 +241,7 @@ Enable or disable file logging via the `WriteToFile` toggle in `EnhancedLoggerSe
 - When using Static methods, you cannot click on the log message itself to navigate to the GameObject. However, you can click the location information (second line showing filename, method, and line number) to navigate to the source code.
 - Instance methods require a MonoBehaviour or GameObject context. Static methods have no GameObject context.
 - File logging writes on application quit, not in real-time. It's intended for post-session analysis, not live streaming.
-- You need to copy the Demo files into your normal Asset folder to use the Demo scene. See [this explanation here as to why](https://forum.unity.com/threads/it-is-not-allowed-to-open-a-scene-in-a-read-only-package-why.1148036/).
+- You need to copy the Demo files into your normal Asset folder to use the Demo scene. See [this explanation here as to why](https://forum.unity.com/threads/it-is-not-allowed-to-open-a-scene-in-a-read-only-package-why.118036/).
 
 ## Inline Documentation
 
@@ -261,8 +261,7 @@ For detailed usage notes, advanced patterns, and implementation details, refer t
 
 ## Tests
 
-You can find tests in the `LogTests.cs` file. To run the tests, open the Unity Test Runner and execute the tests from
-there.
+You can find tests in the `LogTests.cs` file. To run the tests, open the Unity Test Runner and execute the tests from there.
 
 ## Contributing
 
@@ -270,7 +269,4 @@ If you find any issues or have suggestions for improvements, feel free to open a
 
 ## License
 
-Under the MIT License See the [LICENSE](LICENSE) file for more information.
-Feel free to modify the content based on your project's specifics, and add any additional sections or information as
-needed.
-
+Under the MIT License See the [LICENSE](LICENSE) file for more information. Feel free to modify the content based on your project's specifics, and add any additional sections or information as needed.

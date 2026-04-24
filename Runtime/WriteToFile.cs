@@ -34,7 +34,7 @@ namespace SOSXR.EnhancedLogger
         {
             // Initialize the log file path with a timestamp to create a unique file for each session.
             // This method is called before the first scene loads, ensuring the file path is ready
-            // before any logs are written. The Application.quitting event is registered to flush
+            // before any logs are written. The Application.quitting event delegate is registered to flush
             // all cached logs to the file when the application exits.
             var timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss");
             var folder = Path.Combine(Application.persistentDataPath, _folderName);
@@ -64,6 +64,7 @@ namespace SOSXR.EnhancedLogger
             {
                 entry.Count++;
                 entry.LastTime = now;
+                _logCache[message] = entry;
             }
             else
             {
@@ -121,8 +122,8 @@ namespace SOSXR.EnhancedLogger
         }
 
         /// <summary>
-        /// This wrapper is needed to unsubscribe from the quitting event again.
-        /// Otherwise the WriteFile will try to write multiple times in the Editor
+        ///     Flushes logs to disk and unsubscribes the <see cref="Application.quitting"/> delegate.
+        ///     Prevents duplicate file writes in the Editor by removing the event handler after the first invocation.
         /// </summary>
         public static void WriteFinalFile()
         {
@@ -150,7 +151,7 @@ namespace SOSXR.EnhancedLogger
         ///     FirstTime: Timestamp of the first occurrence of this message.
         ///     LastTime: Timestamp of the most recent occurrence of this message.
         /// </summary>
-        private class LogEntry
+        private struct LogEntry
         {
             public int Count;
             public DateTime FirstTime;

@@ -103,9 +103,8 @@ namespace SOSXR.EnhancedLogger
         /// <returns>The message wrapped in Unity color tags with the hex color code.</returns>
         private static string Color(this string message, Color color)
         {
-            var hex = "#" + ColorUtility.ToHtmlStringRGB(color);
-
-            return $"<color={hex}>{message}</color>";
+            var hex = ColorUtility.ToHtmlStringRGB(color);
+            return string.Concat("<color=#", hex, string.Concat(">", message, "</color>"));
         }
 
         /// <summary>
@@ -210,33 +209,21 @@ namespace SOSXR.EnhancedLogger
 
             message ??= string.Empty;
 
-            // Build the location string: extract only the filename (without path) and combine with method name and line number.
-            // This provides a concise reference to where the log was called from.
-            // Pre-format line number to avoid boxing in string interpolation
-            var lineNumberStr = callerLineNumber.ToString();
-            var location =
-                $"{Path.GetFileNameWithoutExtension(callerFilePath)} ({callerName} : {lineNumberStr})";
-
-            var messageStart = $"{GetPrefix(logLevel)} | {location}";
-
-            // Escape curly braces in the message to prevent them from being interpreted as format specifiers
-            // by Unity's LogFormat method, which uses string formatting internally.
-            message = message.Replace("{", "{{").Replace("}", "}}");
+            var fileName = Path.GetFileNameWithoutExtension(callerFilePath);
+            var linePart = string.Concat(" : ", callerLineNumber.ToString(), ")");
+            var location = string.Concat(fileName, " (", callerName, linePart);
+            var messageStart = string.Concat(GetPrefix(logLevel), " | ", location);
+            var coloredPrefix = messageStart.Color(GetColor(logLevel));
 
             // Apply color to the message prefix using Unity's color tag syntax.
             // The Color() extension method converts the Color to a hex string and wraps it in <color> tags.
             // Unity's console interprets these tags to display the text in the specified color.
-            UnityEngine.Debug.LogFormat(
-                LogType.Log,
-                LogOption.None,
-                callerObject,
-                $"{messageStart.Color(GetColor(logLevel))} : {message}\n"
-            );
+            UnityEngine.Debug.Log(string.Concat(coloredPrefix, " : ", message, "\n"), callerObject);
 
             // If file logging is enabled, write the message to the log file (without color tags).
             if (EnhancedLoggerSettings != null && EnhancedLoggerSettings.WriteToFile)
             {
-                WriteToFile.Log($"{messageStart} : {message}");
+                WriteToFile.Log(string.Concat(messageStart, " : ", message));
             }
         }
 
@@ -711,21 +698,15 @@ namespace SOSXR.EnhancedLogger
             {
                 return message;
             }
-
-            System.Text.StringBuilder sb = new System.Text.StringBuilder(message);
-            sb.Append(" : ").Append(message2);
-
-            if (!string.IsNullOrEmpty(message3))
+            if (string.IsNullOrEmpty(message3))
             {
-                sb.Append(" : ").Append(message3);
+                return string.Concat(message, " : ", message2);
             }
-
-            if (!string.IsNullOrEmpty(message4))
+            if (string.IsNullOrEmpty(message4))
             {
-                sb.Append(" : ").Append(message4);
+                return string.Concat(message, " : ", string.Concat(message2, " : ", message3));
             }
-
-            return sb.ToString();
+            return string.Concat(message, " : ", string.Concat(message2, " : ", string.Concat(message3, " : ", message4)));
         }
     }
 }

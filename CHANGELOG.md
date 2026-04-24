@@ -2,12 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
+
+## [1.1.0] - 2026-04-24
+
+### Performance
+
+- Replaced `Debug.LogFormat` with `Debug.Log` to eliminate `object[]` allocation per log message
+- Removed unnecessary brace escaping (`{{`/`}}`) now that `LogFormat` is no longer used
+- Replaced `StringBuilder` in `StringCombiner` with `string.Concat` overloads
+- Replaced interpolated strings with nested `string.Concat` calls in hot path to avoid `string[]`/`object[]` allocations
+- Changed `WriteToFile.LogEntry` from `class` to `struct` to remove per-unique-message heap allocation
+- Fixed `Int32` boxing in location string building by avoiding mixed-type `string.Concat`
+
+### Documentation
+
+- Updated README with `Lifecycle` section describing `Application.quitting` delegate subscription/unsubscription
+- Improved XML documentation on `WriteFinalFile` explaining delegate unsubscribe behavior
+- Updated `Init` comments to mention event delegate registration
+
 ## [1.0.2] - 2026-04-01
 
 ### Fixed
+
 - Bugfix: unsubscribe the WriteFile method
 - Better default settings
-- 
 
 ## [1.0.1] - 2026-03-30
 
