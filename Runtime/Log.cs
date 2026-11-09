@@ -1,6 +1,8 @@
 using System.IO;
 using System.Runtime.CompilerServices;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace SOSXR.EnhancedLogger
@@ -11,7 +13,7 @@ namespace SOSXR.EnhancedLogger
     ///     while also allowing me to persist the log level between editor sessions.
     ///     Change the current log level in the Scene view, the Logging menu, with the DevelopmentBuildLogLevelSetter.cs, or
     ///     even by calling Log.CurrentLogLevel = LogLevel.XXXX from anywhere in your code.
-    ///     Logs are not shown in the release build, thereby hopefully reducing the cost of logging.
+    ///     Release builds show errors only, subject to the configured log level.
     ///     Adapted from DrowsyFoxDev: https://www.youtube.com/watch?v=lRqR4YF8iQs
     /// </summary>
     public static class Log
@@ -39,6 +41,12 @@ namespace SOSXR.EnhancedLogger
                 if (EnhancedLoggerSettings != null)
                 {
                     EnhancedLoggerSettings.CurrentLogLevel = value;
+#if UNITY_EDITOR
+                    if (EditorUtility.IsPersistent(EnhancedLoggerSettings))
+                    {
+                        EditorUtility.SetDirty(EnhancedLoggerSettings);
+                    }
+#endif
                 }
             }
         }
@@ -70,6 +78,19 @@ namespace SOSXR.EnhancedLogger
 #if UNITY_EDITOR
                 var settingsFolder = "Assets/_SOSXR/Resources";
                 var assetPath = $"{settingsFolder}/{nameof(EnhancedLoggerSettings)}.asset";
+
+                EnhancedLoggerSettings = AssetDatabase.LoadAssetAtPath<EnhancedLoggerSettings>(assetPath);
+                if (EnhancedLoggerSettings)
+                {
+                    return;
+                }
+
+                if (File.Exists(assetPath))
+                {
+                    UnityEngine.Debug.LogWarning($"Cannot create logger settings: {assetPath} already exists.");
+                    EnhancedLoggerSettings = ScriptableObject.CreateInstance<EnhancedLoggerSettings>();
+                    return;
+                }
 
                 // Create Resources folder if it doesn't exist
                 if (!Directory.Exists(settingsFolder))
@@ -187,7 +208,7 @@ namespace SOSXR.EnhancedLogger
 
         // ReSharper disable Unity.PerformanceAnalysis
         /// <summary>
-        ///     Logs are not shown in the Release build
+        ///     Only errors are shown in release builds.
         ///     Theoretically, this should be less expensive than the Debug.Log(), over which I have no control.
         /// </summary>
         /// <param name="logLevel"></param>
@@ -218,7 +239,19 @@ namespace SOSXR.EnhancedLogger
             // Apply color to the message prefix using Unity's color tag syntax.
             // The Color() extension method converts the Color to a hex string and wraps it in <color> tags.
             // Unity's console interprets these tags to display the text in the specified color.
-            UnityEngine.Debug.Log(string.Concat(coloredPrefix, " : ", message, "\n"), callerObject);
+            var formattedMessage = string.Concat(coloredPrefix, " : ", message, "\n");
+            switch (logLevel)
+            {
+                case LogLevel.Error:
+                    UnityEngine.Debug.LogError(formattedMessage, callerObject);
+                    break;
+                case LogLevel.Warning:
+                    UnityEngine.Debug.LogWarning(formattedMessage, callerObject);
+                    break;
+                default:
+                    UnityEngine.Debug.Log(formattedMessage, callerObject);
+                    break;
+            }
 
             // If file logging is enabled, write the message to the log file (without color tags).
             if (EnhancedLoggerSettings != null && EnhancedLoggerSettings.WriteToFile)
@@ -230,7 +263,10 @@ namespace SOSXR.EnhancedLogger
         private static bool ShouldShowLogs(LogLevel logLevel)
         {
 #if !UNITY_EDITOR && !DEVELOPMENT_BUILD
-            return false; // Logs are not shown in the Release build
+            if (logLevel != LogLevel.Error)
+            {
+                return false;
+            }
 #endif
 
             // Show logs that are equal to or lower numeric value (higher priority) than the current log level

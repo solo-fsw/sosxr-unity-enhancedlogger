@@ -57,7 +57,7 @@ namespace SOSXR.EnhancedLogger
         /// <summary>Console color applied to Verbose-level log prefixes (default: hot pink).</summary>
         public Color VerboseColor = Color.hotPink;
 
-        /// <summary>When <c>true</c>, log messages are also written to a Markdown file in <c>Application.persistentDataPath/EnhancedLogger/</c> on application quit.</summary>
+        /// <summary>When <c>true</c>, each log message is appended to a session Markdown file in <c>Application.persistentDataPath/EnhancedLogger/</c>.</summary>
         [Header("File Logging")]
         public bool WriteToFile = true;
     }

@@ -37,13 +37,13 @@ The utility is designed to be easy to integrate into your Unity projects.
 
 - Log messages with various log levels (None, Error, Warning, Debug, Info, Success, Verbose)
 - Suppress logs you don't want to see via log level filtering
-- Write logs to markdown files with automatic deduplication and occurrence tracking
+- Optionally write every log message to a session-specific Markdown file
 - Scene view buttons for quick log level changes (bottom-right corner)
 - Click to navigate to the source code and GameObject that called the log
 - Customize log message appearance with colors per log level
 - Support for both instance methods (extension methods) and static methods
 - Support for 1-4 message overloads with automatic joining
-- Runs logs only in Unity Editor and Development Build. Logs are completely stripped from Production builds via compiler directives, making it a zero-cost solution in production
+- Shows logs in the Editor and Development builds; non-development players allow Error-level messages only, subject to the configured log level
 - Automatic settings asset creation on first use
 
 ## Installation
@@ -156,42 +156,41 @@ The selected log level persists between Play mode and Edit mode.
 
 ## File Logging
 
-The EnhancedLogger can automatically write logs to markdown files in your persistent data path. This feature is controlled by the `WriteToFile` toggle in `EnhancedLoggerSettings`.
+EnhancedLogger can write its filtered messages to Markdown files in the persistent data path. The `WriteToFile` toggle in `EnhancedLoggerSettings` controls this output and is enabled by default. Only messages that pass EnhancedLogger's level filter are written; arbitrary Unity logs are not captured.
 
 ### How It Works
 
-- Logs are cached in memory during runtime
-- Identical messages are deduplicated (count tracked instead of duplicating)
-- Each session creates a unique log file with a timestamp
-- File is written when the application quits
-- Location: `Application.persistentDataPath/EnhancedLogger/`
+- File logging is controlled by `EnhancedLoggerSettings.WriteToFile`, enabled by default.
+- The first enabled message creates a unique session Markdown file under `Application.persistentDataPath/EnhancedLogger/`.
+- Each message is written synchronously as one UTC-timestamped line. Duplicate messages get their own lines; message newlines are flattened.
+- Writes open, append, and close the file under a lock. No cache or pending output; `CacheSize` is always `0`.
+- `WriteFile()` and `WriteFinalFile()` remain as compatibility no-ops; messages are already written when the call returns.
+- The Editor ends the file session after leaving Play mode, so late Editor callbacks cannot append to the prior Play session.
+- No automatic or programmatic cleanup occurs. Existing logs and legacy marker files remain untouched. Delete logs manually only while all apps using that data path are closed.
 
-### Deduplication Strategy
+### Thread safety
 
-Instead of writing duplicate messages, the logger tracks:
-
-- **Message content** - The exact message text
-- **Count** - Number of times this message appeared
-- **First occurrence** - Timestamp of when the message was first logged
-- **Last occurrence** - Timestamp of the most recent occurrence
-
-This keeps log files clean and readable while preserving important information about message frequency.
+Call public `Log.*` methods on Unity's main thread. Logging can load or create settings through Unity APIs, especially on first use. The file writer's lock only serializes file writes; it does not make the public logging APIs safe to call from worker threads.
 
 ### Output Format
 
-Log files are written in Markdown format for easy reading and parsing. Each line shows:
+Log files start with a Markdown title. Each message line has this form:
 
 ```
-Message text - from `HH:mm:ss` to `HH:mm:ss` shown **Nx**
+- yyyy-MM-dd HH:mm:ss.fff UTC: `message`
 ```
 
-### Lifecycle
+### Initialization and failures
 
-File logging hooks into Unity's `Application.quitting` event via a delegate:
+- File output initializes at `SubsystemRegistration`. A pre-initialization call is not written and warns once. Initialization resets that failure state, so later messages can be written in the same session.
+- An actual I/O failure after initialization warns once and disables file output for the rest of that session; Unity console logging continues.
+- Synchronous file I/O can stall the calling thread. An abrupt crash or OS buffering can truncate the file or lose recent messages.
 
-- Subscription happens automatically before the first scene loads (`[RuntimeInitializeOnLoadMethod]`)
-- On quit, `WriteFinalFile` flushes the cache and unsubscribes the delegate to prevent duplicate writes in the Editor
-- You can also call `WriteToFile.WriteFile()` manually for an early flush
+### Platform limits
+
+- Web builds need `autoSyncPersistentDataPath` enabled in the Web template or a call to `JS_FileSystem_Sync()` for persistent data to sync. See [Unity Web template build configuration](https://docs.unity3d.com/6000.0/Documentation/Manual/web-templates-build-configuration.html). Web file logging has not been tested.
+- tvOS does not provide `Application.persistentDataPath`, so file output is unavailable there.
+
 
 ## Colors
 
@@ -240,7 +239,8 @@ Enable or disable file logging via the `WriteToFile` toggle in `EnhancedLoggerSe
 
 - When using Static methods, you cannot click on the log message itself to navigate to the GameObject. However, you can click the location information (second line showing filename, method, and line number) to navigate to the source code.
 - Instance methods require a MonoBehaviour or GameObject context. Static methods have no GameObject context.
-- File logging writes on application quit, not in real-time. It's intended for post-session analysis, not live streaming.
+- File logging performs synchronous I/O for each message and can stall the logging thread. Crash or OS buffering can still lose or truncate recent output.
+- Log files are append-only for each session; the package does not clean them up. Delete them manually only with apps using that data path closed.
 - You need to copy the Demo files into your normal Asset folder to use the Demo scene. See [this explanation here as to why](https://forum.unity.com/threads/it-is-not-allowed-to-open-a-scene-in-a-read-only-package-why.118036/).
 
 ## Inline Documentation
@@ -254,14 +254,13 @@ The project includes comprehensive inline documentation in the source code:
 
 For detailed usage notes, advanced patterns, and implementation details, refer to the inline documentation in the source files. This is especially useful for understanding:
 
-- How the message deduplication strategy works
 - How the color injection system works
 - How the button positioning is calculated
 - When to use Static vs instance methods
 
 ## Tests
 
-You can find tests in the `LogTests.cs` file. To run the tests, open the Unity Test Runner and execute the tests from there.
+Tests are under `Tests/Runtime/`, including `LogTests.cs` and `WriteToFileRegressionTests.cs`. Run them from the Unity Test Runner.
 
 ## Contributing
 

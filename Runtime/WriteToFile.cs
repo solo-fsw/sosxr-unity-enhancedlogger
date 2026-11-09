@@ -1,161 +1,128 @@
 using System;
-using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("SOSXR.EnhancedLogger.Tests")]
 
 namespace SOSXR.EnhancedLogger
 {
-    /// <summary>
-    ///     Handles writing log messages to a markdown file in the persistent data path.
-    ///     Uses a caching strategy to deduplicate identical messages and track their frequency and timing.
-    ///     This reduces log file noise by consolidating repeated messages into a single entry with occurrence count.
-    ///     The log file is written when the application quits, containing a summary of all logged messages
-    ///     with timestamps (first and last occurrence) and the number of times each message appeared.
-    /// </summary>
+    /// <summary>Writes each message to a session-specific Markdown file.</summary>
     public static class WriteToFile
     {
-        private static string _folderName => "EnhancedLogger";
-        private static string _filePath;
-        private static readonly Dictionary<string, LogEntry> _logCache = new();
+        private static readonly FileLogSession _session = new();
 
-        /// <summary>
-        ///     Maximum number of unique log entries to cache in memory.
-        ///     When exceeded, older entries are flushed to disk early to prevent memory issues.
-        /// </summary>
-        private const int MaxCacheSize = 10000;
+        /// <summary>No messages are cached; writes complete before returning.</summary>
+        public static int CacheSize => 0;
 
-        /// <summary>
-        ///     Current cache size for monitoring purposes.
-        /// </summary>
-        public static int CacheSize => _logCache.Count;
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void Init()
         {
-            // Initialize the log file path with a timestamp to create a unique file for each session.
-            // This method is called before the first scene loads, ensuring the file path is ready
-            // before any logs are written. The Application.quitting event delegate is registered to flush
-            // all cached logs to the file when the application exits.
-            var timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss");
-            var folder = Path.Combine(Application.persistentDataPath, _folderName);
-            Directory.CreateDirectory(folder);
-
-            _filePath = Path.Combine(folder, $"{Application.productName}_{timestamp}.md");
-
-            Application.quitting += WriteFinalFile; // Subscribe to the quitting event
+            _session.Initialize();
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+            UnityEditor.EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+#endif
         }
 
-        /// <summary>
-        ///     Queues a log message for deduplication and eventual file output.
-        ///     Identical messages increment a shared counter rather than creating duplicate entries.
-        ///     The file is not written until <see cref="WriteFile"/> is called (i.e. on application quit).
-        /// </summary>
-        /// <param name="message">The formatted log message to record (color tags should be stripped before passing).</param>
-        public static void Log(string message)
+#if UNITY_EDITOR
+        private static void OnPlayModeStateChanged(UnityEditor.PlayModeStateChange state)
         {
-            if (string.IsNullOrEmpty(message))
-            {
-                return;
-            }
+            if (state != UnityEditor.PlayModeStateChange.EnteredEditMode) return;
+            _session.EndSession();
+            UnityEditor.EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+        }
+#endif
 
-            var now = DateTime.UtcNow;
+        /// <summary>Appends a message to the current session file.</summary>
+        public static void Log(string message) => _session.Log(message);
 
-            if (_logCache.TryGetValue(message, out var entry))
+        /// <summary>Retained for compatibility; each message is already written.</summary>
+        public static void WriteFile() { }
+
+        /// <summary>Retained for compatibility; there is no pending file output.</summary>
+        public static void WriteFinalFile() { }
+    }
+
+    internal sealed class FileLogSession
+    {
+        private readonly object _sync = new();
+        private string _folderPath;
+        private string _filePath;
+        private string _title;
+        private bool _created;
+        private bool _failed;
+
+        internal FileLogSession(string folderPath = null, string filePath = null, string title = null)
+        {
+            _folderPath = folderPath;
+            _filePath = filePath;
+            _title = title;
+        }
+
+        public int CacheSize => 0;
+
+        internal void Initialize()
+        {
+            var root = Application.persistentDataPath;
+            var folder = string.IsNullOrEmpty(root) ? null : Path.Combine(root, "EnhancedLogger");
+            var timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
+            var path = folder == null ? null : Path.Combine(folder, $"session_{timestamp}_{Guid.NewGuid():N}.md");
+            var title = $"{Application.productName} - {Application.version} - Unity {Application.unityVersion}";
+            lock (_sync)
             {
-                entry.Count++;
-                entry.LastTime = now;
-                _logCache[message] = entry;
+                _folderPath = folder;
+                _filePath = path;
+                _title = title;
+                _created = false;
+                _failed = false;
             }
-            else
+        }
+
+        internal void EndSession()
+        {
+            lock (_sync)
             {
-                if (_logCache.Count >= MaxCacheSize)
+                _folderPath = null;
+                _filePath = null;
+            }
+        }
+
+        public void Log(string message)
+        {
+            if (string.IsNullOrEmpty(message)) return;
+
+            string warning = null;
+            lock (_sync)
+            {
+                if (_failed) return;
+                try
                 {
-                    WriteFile();
+                    if (string.IsNullOrEmpty(_folderPath) || string.IsNullOrEmpty(_filePath))
+                        throw new InvalidOperationException("Persistent file logging is not initialized or unavailable.");
+
+                    Directory.CreateDirectory(_folderPath);
+                    var first = !_created;
+                    using (var stream = new FileStream(_filePath, first ? FileMode.CreateNew : FileMode.Append, FileAccess.Write, FileShare.Read))
+                    using (var writer = new StreamWriter(stream))
+                    {
+                        _created = true;
+                        if (first && !string.IsNullOrEmpty(_title))
+                            writer.WriteLine($"# {_title.Replace('\r', ' ').Replace('\n', ' ')}\n");
+                        var timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
+                        var escaped = message.Replace("`", "\\`").Replace('\r', ' ').Replace('\n', ' ');
+                        writer.WriteLine($"- {timestamp} UTC: `{escaped}`");
+                    }
                 }
-
-                _logCache[message] = new LogEntry
+                catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is ArgumentException || ex is NotSupportedException || ex is System.Security.SecurityException || ex is InvalidOperationException)
                 {
-                    Count = 1,
-                    FirstTime = now,
-                    LastTime = now,
-                };
-            }
-        }
-
-        /// <summary>
-        ///     Flushes all cached log entries to the Markdown file at <see cref="_filePath"/>.
-        ///     Each entry is written with its message text, first/last occurrence timestamps, and occurrence count.
-        ///     Called automatically on <c>Application.quitting</c>; can also be invoked manually for early flush.
-        /// </summary>
-        public static void WriteFile()
-        {
-            try
-            {
-                using var writer = new StreamWriter(_filePath, true);
-
-                var title = $"{Application.productName} - {Application.version} - Unity {Application.unityVersion}";
-                var platform = Application.isEditor ? "Editor" : "Build";
-
-                writer.WriteLine($"# Log Summary of {title} - {platform}\n");
-
-                foreach (var kvp in _logCache)
-                {
-                    var msg = kvp.Key;
-                    var entry = kvp.Value;
-
-                    // Avoid boxing by formatting DateTime and int separately
-                    var firstTime = entry.FirstTime.ToString("HH:mm:ss");
-                    var lastTime = entry.LastTime.ToString("HH:mm:ss");
-                    var countStr = entry.Count.ToString();
-
-                    writer.WriteLine(
-                        $"{EscapeMarkdown(msg)} - from `{firstTime}` to `{lastTime}` shown **{countStr}x**"
-                    );
+                    _failed = true;
+                    warning = $"[WriteToFile] File logging disabled for this session: {ex.Message}";
                 }
-
-                _logCache.Clear();
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"[WriteToFile] Failed to flush log: {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        ///     Flushes logs to disk and unsubscribes the <see cref="Application.quitting"/> delegate.
-        ///     Prevents duplicate file writes in the Editor by removing the event handler after the first invocation.
-        /// </summary>
-        public static void WriteFinalFile()
-        {
-            WriteFile();
-            Application.quitting -= WriteFinalFile; // Unsubscribe from the quitting event
-        }
-
-        private static string EscapeMarkdown(string msg)
-        {
-            if (string.IsNullOrEmpty(msg))
-            {
-                return "`";
             }
 
-            msg = msg.Replace("`", "\\`");
-            msg = msg.Replace("\n", " ");
-            msg = msg.Replace("\r", "");
-
-            return $"`{msg}`";
-        }
-
-        /// <summary>
-        ///     Represents a cached log entry with deduplication information.
-        ///     Count: Number of times this message has been logged.
-        ///     FirstTime: Timestamp of the first occurrence of this message.
-        ///     LastTime: Timestamp of the most recent occurrence of this message.
-        /// </summary>
-        private struct LogEntry
-        {
-            public int Count;
-            public DateTime FirstTime;
-            public DateTime LastTime;
+            if (warning != null) Debug.LogWarning(warning);
         }
     }
 }

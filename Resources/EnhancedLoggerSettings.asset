@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5b8184d66e649d4941124193aaf0071, type: 3}
   m_Name: EnhancedLoggerSettings
   m_EditorClassIdentifier: 
-  CurrentLogLevel: 6
+  CurrentLogLevel: 1
   ErrorPrefix: 'ERROR  '
   WarningPrefix: WARNING
   DebugPrefix: 'DEBUG  '
