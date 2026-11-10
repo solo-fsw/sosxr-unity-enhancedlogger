@@ -6,7 +6,9 @@
     "UnityEditor.TestRunner",
     "SOSXR.EnhancedLogger"
   ],
-  "includePlatforms": [],
+  "includePlatforms": [
+    "Editor"
+  ],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
   "overrideReferences": true,

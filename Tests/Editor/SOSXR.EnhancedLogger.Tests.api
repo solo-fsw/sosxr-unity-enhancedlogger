@@ -1,0 +1,225 @@
+// This file is generated. Do not modify by hand.
+// XML documentation file not found. To check if public methods have XML comments,
+// make sure the XML doc file is present and located next to the scraped dll
+[NUnit.Framework.TestFixture] public class AdditionalEdgeCaseTests : LogTestBase
+{
+    public AdditionalEdgeCaseTests() {}
+    [NUnit.Framework.Test] public void AllLevels_NoneLevel_SuppressesEverything();
+    [NUnit.Framework.Test] public void Debug_WithHtmlTags_Preserved();
+    [NUnit.Framework.Test] public void Error_WithWhitespaceMessage_LogsWhitespace();
+    [NUnit.Framework.Test] public void Info_WithNullMessage2_SkipsNull();
+    [NUnit.Framework.Test] public void Log_AfterMultipleLevelChanges_WorksCorrectly();
+    [NUnit.Framework.Test] public void Static_WithEmptyMessages_AllEmpty();
+    [NUnit.Framework.Test] public void Static_WithNullMessage_HandledCorrectly();
+    [NUnit.Framework.Test] public void Success_WithEmoji_HandledCorrectly();
+    [NUnit.Framework.Test] public void Verbose_WithMixedContent_HandledCorrectly();
+    [NUnit.Framework.Test] public void Warning_WithTabsAndNewlines_HandledCorrectly();
+}
+
+[NUnit.Framework.TestFixture] public class EdgeCases : LogTestBase
+{
+    public EdgeCases() {}
+    [NUnit.Framework.Test] public void Error_EmptyMessage_LogsEmpty();
+    [NUnit.Framework.Test] public void Error_LongMessage_HandledCorrectly();
+    [NUnit.Framework.Test] public void Error_MessageWithSpecialCharacters_HandledCorrectly();
+    [NUnit.Framework.Test] public void Error_NullMessage_DoesNotThrow();
+    [NUnit.Framework.Test] public void Error_UnicodeMessage_HandledCorrectly();
+    [NUnit.Framework.Test] public void GetColor_ReturnsDefault_WhenSettingsNull();
+    [NUnit.Framework.Test] public void GetPrefix_ReturnsDefault_WhenSettingsNull();
+    [NUnit.Framework.Test] public void LogLevel_CanBeChangedAtRuntime();
+}
+
+[NUnit.Framework.TestFixture] public class FileLoggingTests
+{
+    public FileLoggingTests() {}
+    [NUnit.Framework.SetUp] public void Setup();
+    [NUnit.Framework.TearDown] public void TearDown();
+    [NUnit.Framework.Test] public void WriteToFile_Enabled_DoesNotThrow();
+    [NUnit.Framework.Test] public void WriteToFile_MultipleMessages_DoesNotThrow();
+}
+
+[NUnit.Framework.TestFixture] public class FinalCoverageTests : LogTestBase
+{
+    public FinalCoverageTests() {}
+    [NUnit.Framework.Test] public void Debug_With2Parts();
+    [NUnit.Framework.Test] public void Error_WithAllMessageParts_4Parts();
+    [NUnit.Framework.Test] public void Info_SinglePart();
+    [NUnit.Framework.Test] public void Static_FourMessages();
+    [NUnit.Framework.Test] public void Static_SingleMessage();
+    [NUnit.Framework.Test] public void Static_TwoMessages();
+    [NUnit.Framework.Test] public void Success_EmptyPart2_Ignored();
+    [NUnit.Framework.Test] public void Verbose_AllPartsNullExceptFirst();
+    [NUnit.Framework.Test] public void Warning_With3Parts_Part4Ignored();
+}
+
+[NUnit.Framework.TestFixture] public class GameObjectTests : LogTestBase
+{
+    public GameObjectTests() {}
+    [NUnit.Framework.Test] public void Log_AfterObjectDestroyed_StillWorks();
+    [NUnit.Framework.Test] public void Log_MultipleObjects_DistinguishesSources();
+    [NUnit.Framework.Test] public void Log_WithNullObject_DoesNotThrow();
+}
+
+[NUnit.Framework.TestFixture] public class IntegrationTests : LogTestBase
+{
+    public IntegrationTests() {}
+    [NUnit.Framework.Test] public void BulkLogging_100Messages();
+    [NUnit.Framework.Test] public void FullWorkflow_MultipleObjectsAndLevels();
+    [NUnit.Framework.Test] public void RealisticScenario_GameLoop();
+}
+
+[NUnit.Framework.TestFixture] public class LogLevelCombinationsTests : LogTestBase
+{
+    public LogLevelCombinationsTests() {}
+    [NUnit.Framework.Test] public void Debug_SuppressesInfoSuccessVerbose();
+    [NUnit.Framework.Test] public void Error_ShowsOnlyError();
+    [NUnit.Framework.Test] public void Info_SuppressesSuccessAndVerbose();
+    [NUnit.Framework.Test] public void Success_SuppressesVerboseOnly();
+    [NUnit.Framework.Test] public void Verbose_ShowsAllLowerPriority();
+    [NUnit.Framework.Test] public void Warning_SuppressesDebugInfoSuccessVerbose();
+}
+
+[NUnit.Framework.TestFixture] public class LogLevelEnumTests
+{
+    public LogLevelEnumTests() {}
+    [NUnit.Framework.Test] public void LogLevel_Count_IsSeven();
+    [NUnit.Framework.Test] public void LogLevel_HasAllExpectedValues();
+    [NUnit.Framework.Test] public void LogLevel_Values_AreInCorrectOrder();
+}
+
+public abstract class LogTestBase
+{
+    protected System.Collections.Generic.List<LogTestBase.LogEntry> CapturedLogs { get; }
+    protected UnityEngine.GameObject MockObject { get; }
+    protected LogTestBase() {}
+    protected void AssertLogContains(string expectedText, string message = default(string));
+    protected void AssertLogCount(int expectedCount, string message = default(string));
+    protected void AssertLogDoesNotContain(string forbiddenText, string message = default(string));
+    protected void AssertLogLevelPresent(SOSXR.EnhancedLogger.LogLevel level);
+    [NUnit.Framework.SetUp] public void BaseSetup();
+    [NUnit.Framework.TearDown] public void BaseTearDown();
+    protected class LogEntry
+    {
+        public string Message { get; set; }
+        public string StackTrace { get; set; }
+        public System.DateTime Timestamp { get; set; }
+        public UnityEngine.LogType Type { get; set; }
+        public LogEntry() {}
+    }
+}
+
+[NUnit.Framework.TestFixture] public class MessageContentTests : LogTestBase
+{
+    public MessageContentTests() {}
+    [NUnit.Framework.Test] public void Log_ContainsColorTag();
+    [NUnit.Framework.Test] public void Log_ContainsMethodName();
+    [NUnit.Framework.Test] public void Log_ContainsObjectName();
+    [NUnit.Framework.Test] public void Log_ContainsPrefix();
+    [NUnit.Framework.Test] public void MultipleLogs_MaintainOrder();
+    [NUnit.Framework.Test] public void StaticLog_DoesNotContainObjectName();
+}
+
+[NUnit.Framework.TestFixture] public class MultipleMessageOverloads : LogTestBase
+{
+    public MultipleMessageOverloads() {}
+    [NUnit.Framework.Test] public void Debug_TwoMessages_CombinesWithSeparator();
+    [NUnit.Framework.Test] public void Error_FourMessages_CombinesAll();
+    [NUnit.Framework.Test] public void Error_TwoMessages_CombinesWithSeparator();
+    [NUnit.Framework.Test] public void Warning_ThreeMessages_CombinesWithSeparator();
+}
+
+[NUnit.Framework.TestFixture] public class SecurityAndSafetyTests : LogTestBase
+{
+    public SecurityAndSafetyTests() {}
+    [NUnit.Framework.Test] public void Log_WithPathCharacters_Safe();
+    [NUnit.Framework.Test] public void Log_WithPotentialInjection_Safe();
+    [NUnit.Framework.Test] public void Log_WithVeryLongMessage_Handled();
+}
+
+[NUnit.Framework.TestFixture] public class SettingsCreationTests
+{
+    public SettingsCreationTests() {}
+    [NUnit.Framework.Test] public void Settings_AssetExists_AfterAccess();
+    [NUnit.Framework.Test] public void Settings_CanToggleFileLogging();
+    [NUnit.Framework.Test] public void Settings_DefaultValues_AreValid();
+}
+
+[NUnit.Framework.TestFixture] public class SettingsTests
+{
+    public SettingsTests() {}
+    [NUnit.Framework.Test] public void CurrentLogLevel_CanBeSetAndRetrieved();
+    [NUnit.Framework.Test] public void GetColor_ReturnsValidColorForEachLevel();
+    [NUnit.Framework.Test] public void GetPrefix_ReturnsCorrectPrefixForEachLevel();
+    [NUnit.Framework.Test] public void Settings_NotNull();
+}
+
+[NUnit.Framework.TestFixture] public class ShowHigherPriorityLogs : LogTestBase
+{
+    public ShowHigherPriorityLogs() {}
+    [NUnit.Framework.Test] public void Debug_ShowsWarningAndErrorLogs();
+    [NUnit.Framework.Test] public void Info_ShowsAllHigherPriorityLogs();
+    [NUnit.Framework.Test] public void Warning_ShowsErrorLogs();
+}
+
+[NUnit.Framework.TestFixture] public class ShowOwnLogs : LogTestBase
+{
+    public ShowOwnLogs() {}
+    [NUnit.Framework.Test] public void Debug_ShowsDebugLogs();
+    [NUnit.Framework.Test] public void Error_ShowsErrorLogs();
+    [NUnit.Framework.Test] public void Info_ShowsInfoLogs();
+    [NUnit.Framework.Test] public void Success_ShowsSuccessLogs();
+    [NUnit.Framework.Test] public void Verbose_ShowsVerboseLogs();
+    [NUnit.Framework.Test] public void Warning_ShowsWarningLogs();
+}
+
+[NUnit.Framework.TestFixture] public class StaticLogMethods : LogTestBase
+{
+    public StaticLogMethods() {}
+    [NUnit.Framework.Test] public void Static_DefaultsToDebugLevel();
+    [NUnit.Framework.Test] public void Static_Error_LogsMessage();
+    [NUnit.Framework.Test] public void Static_MultipleMessages_CombinesWithSeparator();
+    [NUnit.Framework.Test] public void Static_Warning_LogsMessage();
+}
+
+[NUnit.Framework.TestFixture] public class StressTests : LogTestBase
+{
+    public StressTests() {}
+    [NUnit.Framework.Test] public void ManyUniqueMessages_HandlesCorrectly();
+    [NUnit.Framework.Test] public void RapidLevelSwitching_HandlesCorrectly();
+    [NUnit.Framework.Test] public void RapidLogging_HandlesCorrectly();
+}
+
+[NUnit.Framework.TestFixture] public class StringCombinerTests : LogTestBase
+{
+    public StringCombinerTests() {}
+    [NUnit.Framework.Test] public void StringCombiner_AllEmptyStrings();
+    [NUnit.Framework.Test] public void StringCombiner_AllNullExceptFirst();
+    [NUnit.Framework.Test] public void StringCombiner_MixedNullAndEmpty();
+}
+
+[NUnit.Framework.TestFixture] public class SuppressLowerPriorityLogs : LogTestBase
+{
+    public SuppressLowerPriorityLogs() {}
+    [NUnit.Framework.Test] public void Error_SuppressesWarningAndLowerLogs();
+    [NUnit.Framework.Test] public void None_SuppressesAllLogs();
+    [NUnit.Framework.Test] public void Warning_SuppressesDebugAndLowerLogs();
+}
+
+[NUnit.Framework.TestFixture] public class WriteToFileEdgeCaseTests
+{
+    public WriteToFileEdgeCaseTests() {}
+    [NUnit.Framework.Test] public void WriteToFile_DuplicateMessages_CacheStaysSmall();
+    [NUnit.Framework.Test] public void WriteToFile_Log_EmptyString_DoesNotThrow();
+    [NUnit.Framework.Test] public void WriteToFile_Log_NullMessage_DoesNotThrow();
+    [NUnit.Framework.Test] public void WriteToFile_Log_WithBackticks_EscapesCorrectly();
+    [NUnit.Framework.Test] public void WriteToFile_Log_WithNewlines_HandledCorrectly();
+    [NUnit.Framework.Test] public void WriteToFile_ManyUniqueMessages_CacheGrows();
+}
+
+[NUnit.Framework.TestFixture] public class WriteToFileTests
+{
+    public WriteToFileTests() {}
+    [NUnit.Framework.Test] public void WriteToFile_CacheSize_PropertyWorks();
+    [NUnit.Framework.Test] public void WriteToFile_Log_DoesNotThrowWithNullSettings();
+    [NUnit.Framework.Test] public void WriteToFile_MultipleLogs_DoesNotThrow();
+}

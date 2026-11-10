@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [Unreleased]
+
+### Tests
+
+- Moved all tests from PlayMode (`Tests/Runtime/`) to EditMode (`Tests/Editor/`); the test assembly is now Editor-only
+- Converted `[UnityTest]` coroutine tests to plain `[Test]` methods; logging is synchronous, so the one-frame wait was not needed
+
 ## [1.1.0] - 2026-04-24
 
 ### Performance

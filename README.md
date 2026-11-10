@@ -260,7 +260,7 @@ For detailed usage notes, advanced patterns, and implementation details, refer t
 
 ## Tests
 
-Tests are under `Tests/Runtime/`, including `LogTests.cs` and `WriteToFileRegressionTests.cs`. Run them from the Unity Test Runner.
+Tests are under `Tests/Editor/`, including `LogTests.cs` and `WriteToFileRegressionTests.cs`. They are EditMode tests; run them from the EditMode tab of the Unity Test Runner.
 
 ## Contributing
 
