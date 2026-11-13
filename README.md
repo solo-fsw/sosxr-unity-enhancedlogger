@@ -43,7 +43,7 @@ The utility is designed to be easy to integrate into your Unity projects.
 - Customize log message appearance with colors per log level
 - Support for both instance methods (extension methods) and static methods
 - Support for 1-4 message overloads with automatic joining
-- Shows logs in the Editor and Development builds; non-development players allow Error-level messages only, subject to the configured log level
+- Shows logs in the Editor and Development builds; non-development players allow Error-level messages only, subject to the configured log level. "Development build" means the **Development Build** checkbox, checked at runtime with `Debug.isDebugBuild`. The Unity 6.6 Managed Code Variant setting does not change this
 - Automatic settings asset creation on first use
 
 ## Installation

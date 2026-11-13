@@ -197,12 +197,16 @@ namespace SOSXR.EnhancedLogger
         /// <summary>
         ///     Logs the current log level to the console on startup in Development builds.
         ///     Called automatically via <see cref="RuntimeInitializeOnLoadMethodAttribute"/>; no manual invocation needed.
+        ///     Uses <see cref="UnityEngine.Debug.isDebugBuild"/> at runtime: the DEVELOPMENT_BUILD symbol is deprecated in Unity 6.6 (UAC0009).
         /// </summary>
         [RuntimeInitializeOnLoadMethod]
         public static void ReportLogLevel()
         {
-#if DEVELOPMENT_BUILD
-            UnityEngine.Debug.Log($"Current Log Level: {CurrentLogLevel}");
+#if !UNITY_EDITOR
+            if (UnityEngine.Debug.isDebugBuild)
+            {
+                UnityEngine.Debug.Log($"Current Log Level: {CurrentLogLevel}");
+            }
 #endif
         }
 
@@ -260,10 +264,19 @@ namespace SOSXR.EnhancedLogger
             }
         }
 
+        /// <summary>
+        ///     Player-build filter: non-development players show errors only.
+        ///     Decided at runtime from <see cref="UnityEngine.Debug.isDebugBuild"/>: the DEVELOPMENT_BUILD symbol is deprecated in Unity 6.6 (UAC0009).
+        /// </summary>
+        internal static bool PlayerAllowsLog(LogLevel logLevel, bool isDebugBuild)
+        {
+            return isDebugBuild || logLevel == LogLevel.Error;
+        }
+
         private static bool ShouldShowLogs(LogLevel logLevel)
         {
-#if !UNITY_EDITOR && !DEVELOPMENT_BUILD
-            if (logLevel != LogLevel.Error)
+#if !UNITY_EDITOR
+            if (!PlayerAllowsLog(logLevel, UnityEngine.Debug.isDebugBuild))
             {
                 return false;
             }

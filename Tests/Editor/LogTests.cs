@@ -1294,3 +1294,23 @@ public class SecurityAndSafetyTests : LogTestBase
         AssertLogCount(1);
     }
 }
+
+/// <summary>
+///     Player-build filter that used the DEVELOPMENT_BUILD symbol, deprecated in Unity 6.6 (UAC0009).
+///     It now decides at runtime from Debug.isDebugBuild. The player-only branch can't run in EditMode,
+///     so the pure filter is tested directly.
+/// </summary>
+public class PlayerLogFilterTests
+{
+    [TestCase(LogLevel.Error, false, true)]
+    [TestCase(LogLevel.Warning, false, false)]
+    [TestCase(LogLevel.Info, false, false)]
+    [TestCase(LogLevel.Verbose, false, false)]
+    [TestCase(LogLevel.Error, true, true)]
+    [TestCase(LogLevel.Warning, true, true)]
+    [TestCase(LogLevel.Verbose, true, true)]
+    public void PlayerAllowsLog_ProductionShowsErrorsOnly(LogLevel level, bool isDebugBuild, bool expected)
+    {
+        Assert.AreEqual(expected, Log.PlayerAllowsLog(level, isDebugBuild));
+    }
+}

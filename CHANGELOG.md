@@ -5,8 +5,14 @@ The changelog format is based on [Keep a Changelog](https://keepachangelog.com/e
 
 ## [Unreleased]
 
+### Changed
+
+- Development-build checks use `Debug.isDebugBuild` at runtime instead of the `DEVELOPMENT_BUILD` symbol. Unity 6.6 deprecates that symbol (warning UAC0009) and removes it in 6.8. Affects `Log.ReportLogLevel`, the errors-only filter in non-development players, and `StackTraceInBuild`. Behaviour is unchanged and works on every supported Unity version.
+- New internal `Log.PlayerAllowsLog(LogLevel, bool)` holds the player filter, so it can be tested in EditMode.
+
 ### Tests
 
+- `PlayerLogFilterTests`: errors-only in production players, all levels in development players.
 - Moved all tests from PlayMode (`Tests/Runtime/`) to EditMode (`Tests/Editor/`); the test assembly is now Editor-only
 - Converted `[UnityTest]` coroutine tests to plain `[Test]` methods; logging is synchronous, so the one-frame wait was not needed
 
