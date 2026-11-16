@@ -58,10 +58,24 @@ namespace SOSXR.EnhancedLogger
         /// </summary>
         public static EnhancedLoggerSettings EnhancedLoggerSettings;
 
+#if UNITY_EDITOR
+        private const string SettingsFolder = "Assets/_SOSXR/Resources";
+        private const string SettingsAssetPath = SettingsFolder + "/" + nameof(EnhancedLoggerSettings) + ".asset";
+        private const double TransientSettingsRetryIntervalSeconds = 1d;
+
+        // Temporary settings used while the asset exists on disk but cannot be loaded yet (first import,
+        // Library rebuild). It is not kept for the whole domain: loading the asset is retried at most once per interval.
+        private static EnhancedLoggerSettings s_transientSettings;
+        private static double s_nextTransientSettingsRetryTime;
+#endif
+
         private static void LoadSettingsAsset()
         {
             if (EnhancedLoggerSettings)
             {
+#if UNITY_EDITOR
+                RetryLoadingTransientSettings();
+#endif
                 return;
             }
 
@@ -76,8 +90,8 @@ namespace SOSXR.EnhancedLogger
             if (!EnhancedLoggerSettings)
             {
 #if UNITY_EDITOR
-                var settingsFolder = "Assets/_SOSXR/Resources";
-                var assetPath = $"{settingsFolder}/{nameof(EnhancedLoggerSettings)}.asset";
+                var settingsFolder = SettingsFolder;
+                var assetPath = SettingsAssetPath;
 
                 EnhancedLoggerSettings = AssetDatabase.LoadAssetAtPath<EnhancedLoggerSettings>(assetPath);
                 if (EnhancedLoggerSettings)
@@ -89,6 +103,8 @@ namespace SOSXR.EnhancedLogger
                 {
                     UnityEngine.Debug.LogWarning($"Cannot create logger settings: {assetPath} already exists.");
                     EnhancedLoggerSettings = ScriptableObject.CreateInstance<EnhancedLoggerSettings>();
+                    s_transientSettings = EnhancedLoggerSettings;
+                    s_nextTransientSettingsRetryTime = EditorApplication.timeSinceStartup + TransientSettingsRetryIntervalSeconds;
                     return;
                 }
 
@@ -113,6 +129,44 @@ namespace SOSXR.EnhancedLogger
 #endif
             }
         }
+
+#if UNITY_EDITOR
+        /// <summary>
+        ///     Replaces the temporary settings created by <see cref="LoadSettingsAsset"/> with the real asset once it can be loaded.
+        ///     Does nothing for settings assigned from code (for example by tests).
+        /// </summary>
+        private static void RetryLoadingTransientSettings()
+        {
+            if (s_transientSettings == null || EnhancedLoggerSettings != s_transientSettings)
+            {
+                return;
+            }
+
+            var now = EditorApplication.timeSinceStartup;
+
+            if (now < s_nextTransientSettingsRetryTime)
+            {
+                return;
+            }
+
+            s_nextTransientSettingsRetryTime = now + TransientSettingsRetryIntervalSeconds;
+
+            var loaded = Resources.Load<EnhancedLoggerSettings>(nameof(EnhancedLoggerSettings));
+
+            if (!loaded)
+            {
+                loaded = AssetDatabase.LoadAssetAtPath<EnhancedLoggerSettings>(SettingsAssetPath);
+            }
+
+            if (!loaded)
+            {
+                return;
+            }
+
+            EnhancedLoggerSettings = loaded;
+            s_transientSettings = null;
+        }
+#endif
 
         /// <summary>
         ///     Wraps a message in Unity's color tag syntax to display it in a specific color in the console.
@@ -285,7 +339,8 @@ namespace SOSXR.EnhancedLogger
             // Show logs that are equal to or lower numeric value (higher priority) than the current log level
             // Example: If CurrentLogLevel = Info (4), show Error (1), Warning (2), Debug (3), Info (4), but NOT Success (5) or Verbose (6)
             // Fixed: was >=, should be <=
-            return logLevel <= CurrentLogLevel;
+            // LogLevel.None is not a message level: such messages are never shown, also not when logging is set to None.
+            return logLevel != LogLevel.None && logLevel <= CurrentLogLevel;
         }
 
         /// <summary>

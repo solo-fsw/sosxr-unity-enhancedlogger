@@ -308,6 +308,19 @@ public class SuppressLowerPriorityLogs : LogTestBase
 
         LogAssert.NoUnexpectedReceived();
     }
+
+    [TestCase(LogLevel.None)]
+    [TestCase(LogLevel.Verbose)]
+    public void MessageAtLevelNone_IsNeverShown(LogLevel currentLogLevel)
+    {
+        // Regression: a message logged with LogLevel.None passed the filter (None <= any level).
+        Log.CurrentLogLevel = currentLogLevel;
+        Log.Static("suppressed", LogLevel.None);
+        MockObject.Console("suppressed", LogLevel.None);
+
+        Assert.That(CapturedLogs, Is.Empty);
+        LogAssert.NoUnexpectedReceived();
+    }
 }
 
 /// <summary>

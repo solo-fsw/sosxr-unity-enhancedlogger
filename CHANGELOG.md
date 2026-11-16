@@ -10,7 +10,14 @@ The changelog format is based on [Keep a Changelog](https://keepachangelog.com/e
 - Development-build checks use `Debug.isDebugBuild` at runtime instead of the `DEVELOPMENT_BUILD` symbol. Unity 6.6 deprecates that symbol (warning UAC0009) and removes it in 6.8. Affects `Log.ReportLogLevel`, the errors-only filter in non-development players, and `StackTraceInBuild`. Behaviour is unchanged and works on every supported Unity version.
 - New internal `Log.PlayerAllowsLog(LogLevel, bool)` holds the player filter, so it can be tested in EditMode.
 
+### Fixed
+
+- In the editor, when the settings asset exists on disk but cannot be loaded yet (first import, Library rebuild), the temporary settings are no longer kept for the whole domain. Loading the asset is retried at most once per second.
+- Messages logged with `LogLevel.None` are never shown. They used to pass the filter at every log level, including `None`.
+
 ### Tests
+
+- `MessageAtLevelNone_IsNeverShown`.
 
 - `PlayerLogFilterTests`: errors-only in production players, all levels in development players.
 - Moved all tests from PlayMode (`Tests/Runtime/`) to EditMode (`Tests/Editor/`); the test assembly is now Editor-only
