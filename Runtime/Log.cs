@@ -272,6 +272,7 @@ namespace SOSXR.EnhancedLogger
         /// <param name="logLevel"></param>
         /// <param name="callerObject"></param>
         /// <param name="message"></param>
+        [HideInCallstack]
         private static void Console(
             LogLevel logLevel,
             string message,
@@ -351,6 +352,7 @@ namespace SOSXR.EnhancedLogger
         /// <param name="callerLineNumber"></param>
         /// <param name="callerName"></param>
         /// <param name="callerFilePath"></param>
+        [HideInCallstack]
         public static void Error(
             this Object caller,
             string message,
@@ -374,6 +376,7 @@ namespace SOSXR.EnhancedLogger
         /// <param name="callerLineNumber"></param>
         /// <param name="callerName"></param>
         /// <param name="callerFilePath"></param>
+        [HideInCallstack]
         public static void Error(
             this Object caller,
             string message,
@@ -404,6 +407,7 @@ namespace SOSXR.EnhancedLogger
         /// <param name="callerLineNumber"></param>
         /// <param name="callerName"></param>
         /// <param name="callerFilePath"></param>
+        [HideInCallstack]
         public static void Warning(
             this Object caller,
             string message,
@@ -434,6 +438,7 @@ namespace SOSXR.EnhancedLogger
         /// <param name="callerLineNumber"></param>
         /// <param name="callerName"></param>
         /// <param name="callerFilePath"></param>
+        [HideInCallstack]
         public static void Warning(
             this Object caller,
             string message,
@@ -465,6 +470,7 @@ namespace SOSXR.EnhancedLogger
         /// <param name="callerLineNumber"></param>
         /// <param name="callerName"></param>
         /// <param name="callerFilePath"></param>
+        [HideInCallstack]
         public static void Debug(
             this Object caller,
             string message,
@@ -489,6 +495,7 @@ namespace SOSXR.EnhancedLogger
         /// <param name="callerLineNumber"></param>
         /// <param name="callerName"></param>
         /// <param name="callerFilePath"></param>
+        [HideInCallstack]
         public static void Debug(
             this Object caller,
             string message,
@@ -519,6 +526,7 @@ namespace SOSXR.EnhancedLogger
         /// <param name="callerLineNumber"></param>
         /// <param name="callerName"></param>
         /// <param name="callerFilePath"></param>
+        [HideInCallstack]
         public static void Info(
             this Object caller,
             string message,
@@ -542,6 +550,7 @@ namespace SOSXR.EnhancedLogger
         /// <param name="callerLineNumber"></param>
         /// <param name="callerName"></param>
         /// <param name="callerFilePath"></param>
+        [HideInCallstack]
         public static void Info(
             this Object caller,
             string message,
@@ -572,6 +581,7 @@ namespace SOSXR.EnhancedLogger
         /// <param name="callerLineNumber"></param>
         /// <param name="callerName"></param>
         /// <param name="callerFilePath"></param>
+        [HideInCallstack]
         public static void Success(
             this Object caller,
             string message,
@@ -602,6 +612,7 @@ namespace SOSXR.EnhancedLogger
         /// <param name="callerLineNumber"></param>
         /// <param name="callerName"></param>
         /// <param name="callerFilePath"></param>
+        [HideInCallstack]
         public static void Success(
             this Object caller,
             string message,
@@ -633,6 +644,7 @@ namespace SOSXR.EnhancedLogger
         /// <param name="callerLineNumber"></param>
         /// <param name="callerName"></param>
         /// <param name="callerFilePath"></param>
+        [HideInCallstack]
         public static void Verbose(
             this Object caller,
             string message,
@@ -664,6 +676,7 @@ namespace SOSXR.EnhancedLogger
         /// <param name="callerLineNumber"></param>
         /// <param name="callerName"></param>
         /// <param name="callerFilePath"></param>
+        [HideInCallstack]
         public static void Verbose(
             this Object caller,
             string message,
@@ -695,6 +708,7 @@ namespace SOSXR.EnhancedLogger
         /// <param name="callerLineNumber"></param>
         /// <param name="callerName"></param>
         /// <param name="callerFilePath"></param>
+        [HideInCallstack]
         public static void Console(
             this Object caller,
             string message,
@@ -720,6 +734,7 @@ namespace SOSXR.EnhancedLogger
         /// <param name="callerLineNumber"></param>
         /// <param name="callerName"></param>
         /// <param name="callerFilePath"></param>
+        [HideInCallstack]
         public static void Console(
             this Object caller,
             string message,
@@ -745,13 +760,14 @@ namespace SOSXR.EnhancedLogger
 
         /// <summary>
         ///     Use when calling logs from static methods or when the caller is not an Object.
-        ///     However, it loses the ability to click in the console to go to the line of code that called the log, and the GameObject in the Hierarchy that called it.
+        ///     There is no GameObject to ping in the Hierarchy. Double-clicking the log in the Console still opens the line of code that called it.
         /// </summary>
         /// <param name="message"></param>
         /// <param name="logLevel"></param>
         /// <param name="callerLineNumber"></param>
         /// <param name="callerName"></param>
         /// <param name="callerFilePath"></param>
+        [HideInCallstack]
         public static void Static(
             string message,
             LogLevel logLevel = LogLevel.Debug,
@@ -765,7 +781,7 @@ namespace SOSXR.EnhancedLogger
 
         /// <summary>
         ///     Use when calling logs from static methods or when the caller is not an Object.
-        ///     However, it loses the ability to click in the console to go to the line of code that called the log, and the GameObject in the Hierarchy that called it.
+        ///     There is no GameObject to ping in the Hierarchy. Double-clicking the log in the Console still opens the line of code that called it.
         ///     Overload for multiple messages.
         /// </summary>
         /// <param name="message"></param>
@@ -776,6 +792,7 @@ namespace SOSXR.EnhancedLogger
         /// <param name="callerLineNumber"></param>
         /// <param name="callerName"></param>
         /// <param name="callerFilePath"></param>
+        [HideInCallstack]
         public static void Static(
             string message,
             string message2,

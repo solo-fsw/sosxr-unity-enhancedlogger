@@ -4,7 +4,8 @@
   "references": [
     "UnityEngine.TestRunner",
     "UnityEditor.TestRunner",
-    "SOSXR.EnhancedLogger"
+    "SOSXR.EnhancedLogger",
+    "SOSXR.EnhancedLogger.Editor"
   ],
   "includePlatforms": [
     "Editor"

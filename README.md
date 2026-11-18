@@ -17,6 +17,7 @@ A utility class for logging messages with customisable log levels and colours in
     - [Instance Methods](#instance-methods)
     - [Static Methods](#static-methods)
     - [Multiple Message Overloads](#multiple-message-overloads)
+  - [Console Double-Click](#console-double-click)
   - [Scene View Buttons](#scene-view-buttons)
   - [File Logging](#file-logging)
   - [Colors](#colors)
@@ -39,7 +40,8 @@ The utility is designed to be easy to integrate into your Unity projects.
 - Suppress logs you don't want to see via log level filtering
 - Optionally write every log message to a session-specific Markdown file
 - Scene view buttons for quick log level changes (bottom-right corner)
-- Click to navigate to the source code and GameObject that called the log
+- Double-click a log in the Console to open the code that called the log, not `Log.cs`
+- Click a log from an instance method to ping the GameObject that called it
 - Customize log message appearance with colors per log level
 - Support for both instance methods (extension methods) and static methods
 - Support for 1-4 message overloads with automatic joining
@@ -110,8 +112,8 @@ gameObject.Success("Success message");
 Static methods are useful when you don't have access to a MonoBehaviour instance or when the caller object may be destroyed:
 
 - No GameObject reference in the log output
-- Cannot click to navigate to GameObject in Hierarchy
-- Can still click the location information (second line) to navigate to the source code
+- Cannot click to ping a GameObject in the Hierarchy
+- Double-click the log to open the line of code that called it
 - Useful for logging from static classes or utility methods
 
 Use static methods when needed:
@@ -141,6 +143,43 @@ this.Debug("Loading", "Player data", "from file", "success");
 ```
 
 This is useful for organizing related information in a single log call. See the Samples folder for more examples.
+
+## Console Double-Click
+
+Double-click a log entry in the Unity Console to open the code that called the logger.
+
+### How It Works
+
+1. Double-click a log entry from the logger.
+2. The package reads the stack trace of the selected entry.
+3. It finds the first frame after the last `SOSXR.EnhancedLogger.Log` frame.
+4. It opens that file at that line in your code editor.
+
+This works for instance calls, such as `this.Info("message")`, and for `Log.Static(...)`.
+
+### Stack Trace Formats
+
+The Console has two stack trace logging options. The package supports both.
+
+- **Script Only:** The stack trace contains project paths. The package opens the file at that path.
+- **Full:** The stack trace contains only file names. The package finds the script by file name. If two scripts share a file name, the package uses the class name to choose one.
+
+Clicking a stack trace link inside `Log.cs`, such as `Log.cs:652`, still opens `Log.cs` at that line.
+
+### Clean Stack Traces
+
+Logging methods use `[HideInCallstack]`. To hide the logger frames:
+
+1. Open the Console menu (three dots).
+2. Enable **Strip logging callstack**.
+
+The logger frames no longer appear in the stack trace in the details pane.
+
+### Limits
+
+- The package reads the selected Console entry through private Unity fields: `ConsoleWindow.ms_ConsoleWindow` and `ConsoleWindow.m_ActiveText`. Unity has no public API for this.
+- If a future Unity version renames these fields, double-click opens `Log.cs`. The package does not crash.
+- The EditMode tests in `Tests/Editor/OpenLogCallerTests.cs` fail after a rename. Run these tests after each Unity upgrade.
 
 ## Scene View Buttons
 
@@ -237,7 +276,8 @@ Enable or disable file logging via the `WriteToFile` toggle in `EnhancedLoggerSe
 
 ## Downsides
 
-- When using Static methods, you cannot click on the log message itself to navigate to the GameObject. However, you can click the location information (second line showing filename, method, and line number) to navigate to the source code.
+- When using Static methods, clicking the log does not ping a GameObject. Double-click still opens the line of code that called the log.
+- Double-click navigation reads private Unity fields (`ConsoleWindow.ms_ConsoleWindow` and `ConsoleWindow.m_ActiveText`) by reflection. A future Unity version can rename them. Double-click then opens `Log.cs`; nothing crashes.
 - Instance methods require a MonoBehaviour or GameObject context. Static methods have no GameObject context.
 - File logging performs synchronous I/O for each message and can stall the logging thread. Crash or OS buffering can still lose or truncate recent output.
 - Log files are append-only for each session; the package does not clean them up. Delete them manually only with apps using that data path closed.
@@ -260,7 +300,7 @@ For detailed usage notes, advanced patterns, and implementation details, refer t
 
 ## Tests
 
-Tests are under `Tests/Editor/`, including `LogTests.cs` and `WriteToFileRegressionTests.cs`. They are EditMode tests; run them from the EditMode tab of the Unity Test Runner.
+Tests are under `Tests/Editor/`, including `LogTests.cs`, `WriteToFileRegressionTests.cs`, `LogCallerParserTests.cs` and `OpenLogCallerTests.cs`. They are EditMode tests; run them from the EditMode tab of the Unity Test Runner.
 
 ## Contributing
 

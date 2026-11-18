@@ -3,7 +3,13 @@
 All notable changes to this project will be documented in this file.
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## [Unreleased]
+## [1.2.1] - 2026-11-18
+
+### Added
+
+- Double-clicking a logger message in the Console opens the code that called the logger, not the `Debug.Log` call in `Log.cs`. Works with the "Script Only" and "Full" stack trace logging options. See `Editor/OpenLogCaller.cs`.
+- README section "Console Double-Click".
+- `[HideInCallstack]` on the logging methods. With "Strip logging callstack" on in the Console menu, the logger frames are hidden from the stack trace.
 
 ### Changed
 
@@ -12,11 +18,14 @@ The changelog format is based on [Keep a Changelog](https://keepachangelog.com/e
 
 ### Fixed
 
+- Doc comments on `Log.Static` no longer say double-click to the calling line is lost.
 - In the editor, when the settings asset exists on disk but cannot be loaded yet (first import, Library rebuild), the temporary settings are no longer kept for the whole domain. Loading the asset is retried at most once per second.
 - Messages logged with `LogLevel.None` are never shown. They used to pass the filter at every log level, including `None`.
 
 ### Tests
 
+- `LogCallerParserTests`: finds the caller in both stack trace formats.
+- `OpenLogCallerTests`: fails when Unity renames the private Console members that the double-click redirect reads.
 - `MessageAtLevelNone_IsNeverShown`.
 
 - `PlayerLogFilterTests`: errors-only in production players, all levels in development players.
