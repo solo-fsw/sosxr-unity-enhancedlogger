@@ -166,6 +166,14 @@ The Console has two stack trace logging options. The package supports both.
 
 Clicking a stack trace link inside `Log.cs`, such as `Log.cs:652`, still opens `Log.cs` at that line.
 
+### Stack Trace Setting
+
+Double-click only works when the Console stack trace for Log is **Script Only**. With **Full**, Unity does not open any file on double-click; it only pings the object.
+
+- In the Editor, the package does not change the stack trace setting.
+- To set it, open the Console menu (three dots) and select **Stack Trace Logging > All > Script Only**.
+- In Development builds, `StackTraceInBuild` sets the Log stack trace to Full. In Release builds, it sets it to None.
+
 ### Clean Stack Traces
 
 Logging methods use `[HideInCallstack]`. To hide the logger frames:
@@ -300,7 +308,7 @@ For detailed usage notes, advanced patterns, and implementation details, refer t
 
 ## Tests
 
-Tests are under `Tests/Editor/`, including `LogTests.cs`, `WriteToFileRegressionTests.cs`, `LogCallerParserTests.cs` and `OpenLogCallerTests.cs`. They are EditMode tests; run them from the EditMode tab of the Unity Test Runner.
+Tests are under `Tests/Editor/`, including `LogTests.cs`, `WriteToFileRegressionTests.cs`, `LogCallerParserTests.cs`, `OpenLogCallerTests.cs` and `StackTraceInBuildTests.cs`. They are EditMode tests; run them from the EditMode tab of the Unity Test Runner.
 
 ## Contributing
 

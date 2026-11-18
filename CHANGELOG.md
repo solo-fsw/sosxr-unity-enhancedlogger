@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.2.2] - 2026-11-18
+
+### Fixed
+
+- `StackTraceInBuild` no longer sets the Log stack trace to Full in the Editor. Full stack traces stopped Console double-click from opening the calling code. The Editor now keeps the Console / Player Settings value. Development builds still use Full; Release builds still use None.
+
+### Added
+
+- README: "Stack Trace Setting" under "Console Double-Click".
+
+### Tests
+
+- `StackTraceInBuildTests`: Editor leaves the setting unchanged; Development builds use Full; Release builds use None.
+
 ## [1.2.1] - 2026-11-18
 
 ### Added
