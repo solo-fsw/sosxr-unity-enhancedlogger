@@ -262,7 +262,9 @@ Edit the `EnhancedLoggerSettings` asset to change colors for each log level. The
 
 ## Settings
 
-Settings can be found in a ScriptableObject in the Resources folder called `EnhancedLoggerSettings`.
+Settings are in a ScriptableObject called `EnhancedLoggerSettings`, at `Assets/_SOSXR/Settings/EnhancedLoggerSettings.asset`.
+
+Edit them in **Preferences > SOSXR > EnhancedLogger** (also via the menu `SOSXR > EnhancedLogger > Preferences`). The values are stored in the project asset, so they are shared with everyone who uses the project.
 
 ### LogLevel
 
@@ -272,7 +274,15 @@ Alternatively, set the LogLevel via the Menu bar at `SOSXR > EnhancedLogger`, or
 
 ### Automatic Settings Creation
 
-If the `EnhancedLoggerSettings` asset doesn't exist, it will be created automatically in `Assets/_SOSXR/Resources/` on first use. A warning will be logged to inform you of this automatic creation.
+If the `EnhancedLoggerSettings` asset doesn't exist, it will be created automatically at `Assets/_SOSXR/Settings/EnhancedLoggerSettings.asset` on first use. A warning will be logged to inform you of this automatic creation.
+
+### Settings Location
+
+- The package does not ship a settings asset. The asset always lives in your project, under `Assets/`.
+- The Editor never reads the settings from the `Packages/` folder. Changing the log level does not modify the package.
+- Versions 1.2.2 and older used `Resources/EnhancedLoggerSettings.asset`. That asset is no longer used. After the upgrade, a new asset with default values is created at `Assets/_SOSXR/Settings/`. Set your log level again. You can delete the old `Assets/_SOSXR/Resources/EnhancedLoggerSettings.asset`.
+- Before each build, `EnhancedLoggerSettingsBuild` adds the asset to **Player Settings > Other Settings > Preloaded Assets**. Players load it at startup, so no Resources folder is needed.
+- If you see a warning that `Packages/com.sosxr.enhancedlogger/Resources/EnhancedLoggerSettings.asset` was altered, update the package to 1.2.3 or newer.
 
 ### Prefix
 
@@ -308,7 +318,7 @@ For detailed usage notes, advanced patterns, and implementation details, refer t
 
 ## Tests
 
-Tests are under `Tests/Editor/`, including `LogTests.cs`, `WriteToFileRegressionTests.cs`, `LogCallerParserTests.cs`, `OpenLogCallerTests.cs` and `StackTraceInBuildTests.cs`. They are EditMode tests; run them from the EditMode tab of the Unity Test Runner.
+Tests are under `Tests/Editor/`, including `LogTests.cs`, `WriteToFileRegressionTests.cs`, `LogCallerParserTests.cs`, `OpenLogCallerTests.cs`, `StackTraceInBuildTests.cs` and `EnhancedLoggerSettingsLocationTests.cs`. They are EditMode tests; run them from the EditMode tab of the Unity Test Runner.
 
 ## Contributing
 

@@ -5,8 +5,9 @@ namespace SOSXR.EnhancedLogger
     /// <summary>
     ///     ScriptableObject that stores all configurable settings for the EnhancedLogger.
     ///     Includes the active log level, per-level prefix strings, per-level colors, and the file-logging toggle.
-    ///     Create or locate this asset via <c>SOSXR &gt; EnhancedLogger &gt; EnhancedLoggerSettings</c>, or let it be
-    ///     generated automatically in <c>Assets/_SOSXR/Resources/</c> on first use.
+    ///     Edit it in <c>Preferences &gt; SOSXR &gt; EnhancedLogger</c>. Create it via <c>SOSXR &gt; EnhancedLogger &gt; EnhancedLoggerSettings</c>, or let it be
+    ///     generated automatically at <c>Assets/_SOSXR/Settings/EnhancedLoggerSettings.asset</c> on first use.
+    ///     Builds add the asset to the Preloaded Assets in Player Settings, so players load it without a Resources folder.
     /// </summary>
     [CreateAssetMenu(
         fileName = "EnhancedLoggerSettings",
@@ -60,5 +61,27 @@ namespace SOSXR.EnhancedLogger
         /// <summary>When <c>true</c>, each log message is appended to a session Markdown file in <c>Application.persistentDataPath/EnhancedLogger/</c>.</summary>
         [Header("File Logging")]
         public bool WriteToFile = true;
+
+        /// <summary>
+        ///     The first settings instance that was enabled. In players this is the Preloaded Asset, which Unity loads at startup.
+        ///     <see cref="Log" /> uses it in players only; the Editor loads the asset from the project.
+        /// </summary>
+        internal static EnhancedLoggerSettings Instance { get; private set; }
+
+        private void OnEnable()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (Instance == this)
+            {
+                Instance = null;
+            }
+        }
     }
 }

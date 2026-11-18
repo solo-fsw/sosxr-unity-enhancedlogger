@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.2.3] - 2026-11-18
+
+### Fixed
+
+- The package no longer ships `Resources/EnhancedLoggerSettings.asset`. In the Editor, `Resources.Load` found that copy inside the immutable package, and changing the log level modified it (Unity warning: "assets located in immutable packages were unexpectedly altered").
+
+### Changed
+
+- The settings asset lives at `Assets/_SOSXR/Settings/EnhancedLoggerSettings.asset` and is created there when missing.
+- The Editor loads the settings only from `Assets/_SOSXR/Settings/EnhancedLoggerSettings.asset`. It never uses `Resources.Load`.
+- Players load the settings as a Preloaded Asset (`EnhancedLoggerSettings.Instance`, set in `OnEnable`). Players no longer use `Resources.Load`.
+- Upgrading: the old `Resources/EnhancedLoggerSettings.asset` is not used or moved. A new asset with default values is created; set the log level again.
+
+### Added
+
+- Settings in **Preferences > SOSXR > EnhancedLogger** (`EnhancedLoggerPreferences`), and menu item `SOSXR > EnhancedLogger > Preferences`.
+- `EnhancedLoggerSettingsBuild`: before each build, adds the settings asset to the Preloaded Assets in Player Settings, and removes other `EnhancedLoggerSettings` entries.
+- README: "Settings Location".
+
+### Tests
+
+- `EnhancedLoggerSettingsLocationTests`: settings path, no settings asset in the package, no settings loaded from `Packages/`, Preferences path, and the Preloaded Assets list update.
+
 ## [1.2.2] - 2026-11-18
 
 ### Fixed

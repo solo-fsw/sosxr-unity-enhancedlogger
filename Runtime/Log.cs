@@ -5,6 +5,8 @@ using UnityEditor;
 #endif
 using UnityEngine;
 
+[assembly: InternalsVisibleTo("SOSXR.EnhancedLogger.Editor")]
+
 namespace SOSXR.EnhancedLogger
 {
     /// <summary>
@@ -53,14 +55,17 @@ namespace SOSXR.EnhancedLogger
 
         /// <summary>
         ///     Reference to the settings asset that stores log level, prefixes, colors, and file-logging options.
-        ///     Loaded automatically from the Resources folder on first use. If the asset does not exist,
-        ///     it is created at <c>Assets/_SOSXR/Resources/EnhancedLoggerSettings.asset</c>.
+        ///     Loaded automatically on first use. In the Editor it is loaded from
+        ///     <c>Assets/_SOSXR/Settings/EnhancedLoggerSettings.asset</c>, and created there if it does not exist.
+        ///     In players it is the asset that the build added to the Preloaded Assets in Player Settings.
+        ///     The asset is never read from, or written to, the package folder.
         /// </summary>
         public static EnhancedLoggerSettings EnhancedLoggerSettings;
 
 #if UNITY_EDITOR
-        private const string SettingsFolder = "Assets/_SOSXR/Resources";
-        private const string SettingsAssetPath = SettingsFolder + "/" + nameof(EnhancedLoggerSettings) + ".asset";
+        internal const string SettingsFolder = "Assets/_SOSXR/Settings";
+        internal const string SettingsAssetPath = SettingsFolder + "/" + nameof(EnhancedLoggerSettings) + ".asset";
+
         private const double TransientSettingsRetryIntervalSeconds = 1d;
 
         // Temporary settings used while the asset exists on disk but cannot be loaded yet (first import,
@@ -79,58 +84,57 @@ namespace SOSXR.EnhancedLogger
                 return;
             }
 
-            // Try to load from Resources folder first
-            EnhancedLoggerSettings = Resources.Load<EnhancedLoggerSettings>(
-                nameof(EnhancedLoggerSettings)
-            );
+#if UNITY_EDITOR
+            // Only the asset at SettingsAssetPath is used. Resources.Load is not used in the Editor: it can return a copy
+            // inside an immutable package (Packages/...), and changing the log level would then modify that package.
+            EnhancedLoggerSettings = FindSettingsInProject();
 
-            // Fallback: if the settings asset doesn't exist, create it automatically.
-            // This ensures the logger always has a valid configuration, even on first use.
-            // The asset is created in Assets/_SOSXR/Resources/ so it can be loaded at runtime via Resources.Load().
+            if (EnhancedLoggerSettings)
+            {
+                return;
+            }
+
+            if (File.Exists(SettingsAssetPath))
+            {
+                UnityEngine.Debug.LogWarning($"Cannot create logger settings: {SettingsAssetPath} already exists.");
+                EnhancedLoggerSettings = ScriptableObject.CreateInstance<EnhancedLoggerSettings>();
+                s_transientSettings = EnhancedLoggerSettings;
+                s_nextTransientSettingsRetryTime = EditorApplication.timeSinceStartup + TransientSettingsRetryIntervalSeconds;
+                return;
+            }
+
+            // No settings asset in the project: create it, so the logger always has a valid configuration.
+            if (!Directory.Exists(SettingsFolder))
+            {
+                Directory.CreateDirectory(SettingsFolder);
+            }
+
+            EnhancedLoggerSettings = ScriptableObject.CreateInstance<EnhancedLoggerSettings>();
+            AssetDatabase.CreateAsset(EnhancedLoggerSettings, SettingsAssetPath);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            UnityEngine.Debug.LogWarning($"No Settings asset found, creating a new one at {SettingsAssetPath}.");
+#else
+            // Player: the asset is a Preloaded Asset, which registers itself in OnEnable.
+            EnhancedLoggerSettings = EnhancedLoggerSettings.Instance;
+
             if (!EnhancedLoggerSettings)
             {
-#if UNITY_EDITOR
-                var settingsFolder = SettingsFolder;
-                var assetPath = SettingsAssetPath;
-
-                EnhancedLoggerSettings = AssetDatabase.LoadAssetAtPath<EnhancedLoggerSettings>(assetPath);
-                if (EnhancedLoggerSettings)
-                {
-                    return;
-                }
-
-                if (File.Exists(assetPath))
-                {
-                    UnityEngine.Debug.LogWarning($"Cannot create logger settings: {assetPath} already exists.");
-                    EnhancedLoggerSettings = ScriptableObject.CreateInstance<EnhancedLoggerSettings>();
-                    s_transientSettings = EnhancedLoggerSettings;
-                    s_nextTransientSettingsRetryTime = EditorApplication.timeSinceStartup + TransientSettingsRetryIntervalSeconds;
-                    return;
-                }
-
-                // Create Resources folder if it doesn't exist
-                if (!Directory.Exists(settingsFolder))
-                {
-                    Directory.CreateDirectory(settingsFolder);
-                }
-
-                // Create the settings asset if it doesn't exist, in the settingsPath
                 EnhancedLoggerSettings = ScriptableObject.CreateInstance<EnhancedLoggerSettings>();
-                AssetDatabase.CreateAsset(EnhancedLoggerSettings, assetPath);
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
-
-                UnityEngine.Debug.LogWarningFormat(
-                    $"No Settings asset found, creating a new one in the Resources folder at {assetPath}."
-                );
-#else
-                // In runtime/test mode, create a temporary instance if no asset exists
-                EnhancedLoggerSettings = ScriptableObject.CreateInstance<EnhancedLoggerSettings>();
-#endif
             }
+#endif
         }
 
 #if UNITY_EDITOR
+        /// <summary>
+        ///     Loads the settings asset from <see cref="SettingsAssetPath" />. Never from <c>Packages/</c>.
+        /// </summary>
+        internal static EnhancedLoggerSettings FindSettingsInProject()
+        {
+            return AssetDatabase.LoadAssetAtPath<EnhancedLoggerSettings>(SettingsAssetPath);
+        }
+
         /// <summary>
         ///     Replaces the temporary settings created by <see cref="LoadSettingsAsset"/> with the real asset once it can be loaded.
         ///     Does nothing for settings assigned from code (for example by tests).
@@ -151,12 +155,7 @@ namespace SOSXR.EnhancedLogger
 
             s_nextTransientSettingsRetryTime = now + TransientSettingsRetryIntervalSeconds;
 
-            var loaded = Resources.Load<EnhancedLoggerSettings>(nameof(EnhancedLoggerSettings));
-
-            if (!loaded)
-            {
-                loaded = AssetDatabase.LoadAssetAtPath<EnhancedLoggerSettings>(SettingsAssetPath);
-            }
+            var loaded = FindSettingsInProject();
 
             if (!loaded)
             {
