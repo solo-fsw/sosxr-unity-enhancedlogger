@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.2.4] - 2026-11-23
+
+### Fixed
+
+- The package did not compile on Unity 6000.0 and 6000.1, which `package.json` supports: the default colors used `Color.softRed`, `Color.orange`, `Color.cornflowerBlue`, `Color.khaki`, `Color.softGreen` and `Color.hotPink`, which exist from 6000.2. The defaults are now the same colors written as RGB values.
+- Drawing the Scene view buttons created `Assets/_SOSXR/Settings/EnhancedLoggerSettings.asset` in a project that had none, and read the log level seven times per GUI event. The buttons now read the level once, from the loaded or existing asset, and never create it.
+- The Scene view buttons reset the background color to white instead of the previous color.
+
+### Added
+
+- Menu item `SOSXR > EnhancedLogger > Show Scene View Buttons`, and `LogButtons.ShowSceneViewButtons` (EditorPrefs, default on).
+- EditMode tests: `EnhancedLoggerSettingsDefaultsTests`.
+
+### Changed
+
+- `LogButtons` is a static class instead of a `MonoBehaviour` with `[ExecuteAlways]`. It is in an Editor-only assembly, so as a component it would be missing in builds.
+
 ## [1.2.3] - 2026-11-18
 
 ### Fixed

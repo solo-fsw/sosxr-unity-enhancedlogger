@@ -12,9 +12,22 @@ namespace SOSXR.EnhancedLogger.EditorScripts
     ///     Also adds menu items to change the log level (see the Logging menu)
     ///     Log level is persistent from Play mode to Edit mode and vice versa
     /// </summary>
-    [ExecuteAlways]
-    public class LogButtons : MonoBehaviour
+    public static class LogButtons
     {
+        // A static class, not a MonoBehaviour: it lives in an Editor-only assembly and only holds static code.
+        private const string ShowButtonsPrefKey = "SOSXR.EnhancedLogger.ShowSceneViewButtons";
+
+        /// <summary>Whether the log level buttons are drawn in the Scene view. Stored per user in EditorPrefs. Default: true.</summary>
+        public static bool ShowSceneViewButtons
+        {
+            get => EditorPrefs.GetBool(ShowButtonsPrefKey, true);
+            set
+            {
+                EditorPrefs.SetBool(ShowButtonsPrefKey, value);
+                SceneView.RepaintAll();
+            }
+        }
+
         // Calculate the total number of buttons needed by getting the highest enum value and adding 1.
         // This ensures we have a button for each log level, including the "None" level.
         private static readonly int _buttonCount =
@@ -33,6 +46,15 @@ namespace SOSXR.EnhancedLogger.EditorScripts
 
         private static void OnSceneGUI(SceneView sceneView)
         {
+            if (!ShowSceneViewButtons)
+            {
+                return;
+            }
+
+            // Read the level once per GUI event. Don't use Log.CurrentLogLevel here: it creates the settings asset
+            // when it is missing, and drawing the Scene view must not add files to the project.
+            var currentLevel = GetDisplayedLogLevel();
+
             Handles.BeginGUI();
 
             // Get the size of the Scene view
@@ -52,37 +74,37 @@ namespace SOSXR.EnhancedLogger.EditorScripts
 
             GUILayout.BeginVertical();
 
-            if (CreateButton(nameof(None)))
+            if (CreateButton(nameof(None), currentLevel))
             {
                 None();
             }
 
-            if (CreateButton(nameof(Error)))
+            if (CreateButton(nameof(Error), currentLevel))
             {
                 Error();
             }
 
-            if (CreateButton(nameof(Warning)))
+            if (CreateButton(nameof(Warning), currentLevel))
             {
                 Warning();
             }
 
-            if (CreateButton(nameof(Debug)))
+            if (CreateButton(nameof(Debug), currentLevel))
             {
                 Debug();
             }
 
-            if (CreateButton(nameof(Info)))
+            if (CreateButton(nameof(Info), currentLevel))
             {
                 Info();
             }
 
-            if (CreateButton(nameof(Success)))
+            if (CreateButton(nameof(Success), currentLevel))
             {
                 Success();
             }
 
-            if (CreateButton(nameof(Verbose)))
+            if (CreateButton(nameof(Verbose), currentLevel))
             {
                 Verbose();
             }
@@ -94,9 +116,18 @@ namespace SOSXR.EnhancedLogger.EditorScripts
             Handles.EndGUI();
         }
 
-        private static bool CreateButton(string text)
+        /// <summary>The level shown by the buttons: from the loaded or existing settings asset, without creating one.</summary>
+        private static LogLevel GetDisplayedLogLevel()
         {
-            var isSelected = Log.CurrentLogLevel.ToString() == text;
+            var settings = Log.EnhancedLoggerSettings ? Log.EnhancedLoggerSettings : Log.FindSettingsInProject();
+
+            return settings ? settings.CurrentLogLevel : LogLevel.Info;
+        }
+
+        private static bool CreateButton(string text, LogLevel currentLevel)
+        {
+            var isSelected = currentLevel.ToString() == text;
+            var previousColor = GUI.backgroundColor;
 
             if (isSelected)
             {
@@ -109,12 +140,23 @@ namespace SOSXR.EnhancedLogger.EditorScripts
                 GUILayout.Height(_buttonHeight)
             );
 
-            if (isSelected)
-            {
-                GUI.backgroundColor = Color.white; // Reset the color after drawing the button
-            }
+            GUI.backgroundColor = previousColor; // Restore the color the Scene view used
 
             return result;
+        }
+
+        [MenuItem(_menuPath + "Show Scene View Buttons", false, 50)]
+        private static void ToggleSceneViewButtons()
+        {
+            ShowSceneViewButtons = !ShowSceneViewButtons;
+        }
+
+        [MenuItem(_menuPath + "Show Scene View Buttons", true)]
+        private static bool ToggleSceneViewButtonsValidate()
+        {
+            Menu.SetChecked(_menuPath + "Show Scene View Buttons", ShowSceneViewButtons);
+
+            return true;
         }
 
         [MenuItem("SOSXR/Folders/" + nameof(EnhancedLogger), false, 100)]

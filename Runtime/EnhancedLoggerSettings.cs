@@ -39,24 +39,27 @@ namespace SOSXR.EnhancedLogger
         /// <summary>Prefix prepended to Verbose-level log messages (default: <c>VERBOSE</c>).</summary>
         public string VerbosePrefix = "VERBOSE";
 
+        // The defaults are written as RGB values, not as Color.softRed etc.: those presets exist only from Unity 6000.2,
+        // and this package supports 6000.0. The values are the same as the presets.
+
         /// <summary>Console color applied to Error-level log prefixes (default: soft red).</summary>
         [Header("Colors")]
-        public Color ErrorColor = Color.softRed;
+        public Color ErrorColor = new(0.8627452f, 0.1921569f, 0.1960784f, 1f);
 
         /// <summary>Console color applied to Warning-level log prefixes (default: orange).</summary>
-        public Color WarningColor = Color.orange;
+        public Color WarningColor = new(1f, 0.6470588f, 0f, 1f);
 
         /// <summary>Console color applied to Debug-level log prefixes (default: cornflower blue).</summary>
-        public Color DebugColor = Color.cornflowerBlue;
+        public Color DebugColor = new(0.3921569f, 0.5843138f, 0.9294118f, 1f);
 
         /// <summary>Console color applied to Info-level log prefixes (default: khaki).</summary>
-        public Color InfoColor = Color.khaki;
+        public Color InfoColor = new(0.9411765f, 0.9019608f, 0.5490196f, 1f);
 
         /// <summary>Console color applied to Success-level log prefixes (default: soft green).</summary>
-        public Color SuccessColor = Color.softGreen;
+        public Color SuccessColor = new(0.5490196f, 0.7882354f, 0.1411765f, 1f);
 
         /// <summary>Console color applied to Verbose-level log prefixes (default: hot pink).</summary>
-        public Color VerboseColor = Color.hotPink;
+        public Color VerboseColor = new(1f, 0.4117647f, 0.7058824f, 1f);
 
         /// <summary>When <c>true</c>, each log message is appended to a session Markdown file in <c>Application.persistentDataPath/EnhancedLogger/</c>.</summary>
         [Header("File Logging")]

@@ -196,8 +196,11 @@ The EnhancedLogger provides convenient buttons in the Scene view for quick log l
 - **Location:** Bottom-right corner of the Scene view
 - **Buttons:** None, Error, Warning, Debug, Info, Success, Verbose
 - **Current Level:** Highlighted in green
+- **Hide or show:** `SOSXR > EnhancedLogger > Show Scene View Buttons`. Stored per user (EditorPrefs); shown by default.
 
 Alternatively, use the menu: `SOSXR > EnhancedLogger > [LogLevel]`
+
+Drawing the buttons does not create the settings asset. It is created the first time you change the level or log a message.
 
 The selected log level persists between Play mode and Edit mode.
 
@@ -245,12 +248,14 @@ Each log level has a customizable color that appears in the console prefix.
 
 ### Default Colors
 
-- **Error:** Red
+- **Error:** Soft red
 - **Warning:** Orange
 - **Debug:** Cornflower Blue
 - **Info:** Khaki
-- **Success:** Green
+- **Success:** Soft green
 - **Verbose:** Hot Pink
+
+The defaults are the same as Unity's `Color.softRed`, `Color.orange` and so on, but written as RGB values, because those presets only exist from Unity 6000.2.
 
 ### How Colors Work
 
